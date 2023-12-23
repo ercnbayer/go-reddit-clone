@@ -1,0 +1,38 @@
+{{ range . }}
+
+
+package migration
+
+	import (
+		"emreddit/db"
+		"emreddit/logger"
+	)
+	
+	type  {{.Name}}{{.Timestamp}} struct {
+
+	}
+	
+	
+	func (table {{.Name}}{{.Timestamp}}) TableName() string {
+		return "{{.TableName}}"
+	}
+	func {{.Name}}Up{{.Timestamp}}() error {
+
+		return nil
+	}
+	func {{.Name}}Down{{.Timestamp}}() error {
+		
+		return nil
+	}
+	
+	func init() {
+	
+		Migrations_Arr = append(Migrations_Arr, Migration{
+			Name:   "{{.Name}}{{.Timestamp}}",
+			UpFn:   {{.Name}}Up{{.Timestamp}},
+			DownFn: {{.Name}}Down{{.Timestamp}},
+		})
+		logger.Info("{{.SuccessInitLog}}")
+	
+	}	
+{{ end }}
