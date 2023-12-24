@@ -178,7 +178,7 @@ func listUsers(c *fiber.Ctx) error {
 	return c.JSON(people)
 }
 
-func UserInit() {
+func UserInit() { //creating routes
 	userApi := App.Group("/user") // grouping rotues
 
 	userApi.Post("/", registerUser) // creating user

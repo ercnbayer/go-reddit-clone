@@ -11,13 +11,13 @@ type UserPayload struct { //payload for registerUser
 
 type UserUpdatePayload struct { //payload for updating user
 	ID       string
-	Name     string `validate:"omitempty,required"`
+	Name     string `validate:"omitempty,required"` /* if struct field not empty validate */
 	Password string `validate:"omitempty,required"`
 	Email    string `validate:"omitempty,required,email"`
 }
 
 type UserLoginPayload struct { // payload for Login User
-	Email    string `validate:"required,email"`
+	Email    string `validate:"required,email"` //validate email
 	Password string `validate:"required"`
 }
 
