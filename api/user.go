@@ -15,7 +15,7 @@ func getSingleUser(c *fiber.Ctx) error {
 	// Get the ID from the URL parameter
 	id := c.Params("id") // getting id from params
 
-	err := validator.ValidateID(id)
+	err := validator.ValidateID(id) //validating id
 
 	if err != nil {
 
@@ -25,7 +25,7 @@ func getSingleUser(c *fiber.Ctx) error {
 	}
 
 	var user db.User
-	err = db.ReadPerson(id, &user)
+	err = db.ReadUser(id, &user) //readingUser
 
 	if err != nil { //check if err is not null
 
@@ -41,7 +41,7 @@ func deleteUser(c *fiber.Ctx) error {
 
 	id := c.Params("id") // getting id from params
 
-	err := validator.ValidateID(id)
+	err := validator.ValidateID(id) //validating id
 
 	if err != nil {
 
@@ -63,9 +63,9 @@ func deleteUser(c *fiber.Ctx) error {
 
 func updateUser(c *fiber.Ctx) error {
 
-	id := c.Params("id")
+	id := c.Params("id") //getting id from params
 
-	err := validator.ValidateID(id)
+	err := validator.ValidateID(id) //validating id
 
 	if err != nil {
 
@@ -76,7 +76,7 @@ func updateUser(c *fiber.Ctx) error {
 
 	var user UserUpdatePayload // creating instance
 
-	if err := c.BodyParser(&user); err != nil { // check if err
+	if err := c.BodyParser(&user); err != nil { // check if err from body
 
 		logger.Error(" Body Parse error = ", err, user)
 
@@ -84,7 +84,7 @@ func updateUser(c *fiber.Ctx) error {
 	}
 	user.ID = id
 
-	if err := validator.ValidateUpdatedStruct(&user); err != nil {
+	if err := validator.ValidateUpdatedStruct(&user); err != nil { //validating updated values
 
 		logger.Error("validator err= ", err)
 
@@ -93,9 +93,9 @@ func updateUser(c *fiber.Ctx) error {
 
 	var dbUser db.User
 
-	mapUserUpdatePayloadToDbUser(&user, &dbUser)
+	mapUserUpdatePayloadToDbUser(&user, &dbUser) // maping user to dbUser
 
-	if err := db.PatchUpdateUser(&dbUser); err != nil {
+	if err := db.PatchUpdateUser(&dbUser); err != nil { //sending it to db
 
 		logger.Error("Update ERR:", err)
 
@@ -105,25 +105,25 @@ func updateUser(c *fiber.Ctx) error {
 	return c.Status(200).JSON(user)
 }
 
-func createUser(c *fiber.Ctx) error {
+func registerUser(c *fiber.Ctx) error { // for registering user
 
 	var user UserPayload
 
-	if err := c.BodyParser(&user); err != nil {
+	if err := c.BodyParser(&user); err != nil { //parsing body
 
 		logger.Error("BodyParsing err:", user)
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := validator.ValidateStruct(&user); err != nil {
+	if err := validator.ValidateStruct(&user); err != nil { //validating struct
 		return c.Status(400).JSON(err.Error())
 	}
 
 	var dbUser db.User
 
-	mapUserPayloadToDbUserCreate(&user, &dbUser)
+	mapUserPayloadToDbUserCreate(&user, &dbUser) //maping to db obj
 
-	if err := db.InsertUser(&dbUser); err != nil {
+	if err := db.InsertUser(&dbUser); err != nil { //Inserting user
 
 		logger.Error("User Insert Err", err)
 
@@ -139,22 +139,22 @@ func userLogin(c *fiber.Ctx) error {
 
 	var user UserLoginPayload
 
-	if err := c.BodyParser(&user); err != nil {
+	if err := c.BodyParser(&user); err != nil { //parsing body
 
 		logger.Error("BodyParsing err:", user)
 		return c.Status(400).JSON(err.Error())
 	}
 
-	if err := validator.ValidateStruct(&user); err != nil {
+	if err := validator.ValidateStruct(&user); err != nil { //validating struct
 
 		return c.Status(400).JSON(err.Error())
 	}
 
 	var dbUser db.User
 
-	mapUserLoginPayloadToDbUser(&user, &dbUser)
+	mapUserLoginPayloadToDbUser(&user, &dbUser) //maping user to db obj
 
-	if err := db.LoginUser(&dbUser); err != nil {
+	if err := db.LoginUser(&dbUser); err != nil { // sending it to db
 
 		logger.Error("login err", err)
 
@@ -167,7 +167,7 @@ func userLogin(c *fiber.Ctx) error {
 
 func listUsers(c *fiber.Ctx) error {
 
-	people, err := db.GetUsers() //list api
+	people, err := db.GetUsers() //getting all userslist
 
 	if err != nil {
 
@@ -181,7 +181,7 @@ func listUsers(c *fiber.Ctx) error {
 func UserInit() {
 	userApi := App.Group("/user") // grouping rotues
 
-	userApi.Post("/", createUser) // creating user
+	userApi.Post("/", registerUser) // creating user
 
 	userApi.Get(":id", getSingleUser) // get single user
 

@@ -60,7 +60,7 @@ func DeleteUser(id string) (string, error) {
 	return id, nil
 }
 
-func ReadPerson(id string, user *User) error {
+func ReadUser(id string, user *User) error {
 
 	/*if err := Db.First(&Person{ID: id}).Error; err != nil {
 		return err
