@@ -11,5 +11,6 @@ for running migration
  
  for creating migration 
  ```just call Init function from migration-utils package comment api package```
+ 
  for running migrations
- ```just call RunUp function from migration-utils package also comment api package```
+ ```just call RunUp function from migration-utils package alsocomment api package```
