@@ -14,12 +14,12 @@ type User struct {
 
 // TableName overrides the table name used by User to `profiles`
 func (table *User) TableName() string {
-	return "users"
+	return "users" //set TableName to operate
 }
 
-func InsertUser(user *User) error {
+func InsertUser(user *User) error { //inserting user
 
-	if err := Db.Save(user).Error; err != nil {
+	if err := Db.Save(user).Error; err != nil { //checking for errors
 		return err
 	}
 
@@ -29,7 +29,7 @@ func InsertUser(user *User) error {
 
 }
 
-func LoginUser(user *User) error {
+func LoginUser(user *User) error { //checking login creds
 
 	if err := Db.Where(" email=? AND password=? ", user.Email, user.Password).First(&user).Error; err != nil {
 		logger.Info("Wrong Creds entry", err)
@@ -40,7 +40,7 @@ func LoginUser(user *User) error {
 
 }
 
-func DeleteUser(id string) (string, error) {
+func DeleteUser(id string) (string, error) { //delete User
 
 	var QueryResult = Db.Delete(&User{ID: id})
 
@@ -50,7 +50,7 @@ func DeleteUser(id string) (string, error) {
 		return id, err
 
 	}
-	if QueryResult.RowsAffected == 0 {
+	if QueryResult.RowsAffected == 0 { //checking affecting row to know if any operation took effect
 
 		logger.Info("USER IS NOT FOUND")
 
@@ -62,30 +62,26 @@ func DeleteUser(id string) (string, error) {
 
 func ReadUser(id string, user *User) error {
 
-	/*if err := Db.First(&Person{ID: id}).Error; err != nil {
-		return err
-	}*/
+	user.ID = id //setting id
 
-	user.ID = id
-
-	if err := Db.First(user).Error; err != nil {
+	if err := Db.First(user).Error; err != nil { //checking for errors.
 		return err
 	}
 
 	return nil
 }
 
-func PatchUpdateUser(user *User) error {
+func PatchUpdateUser(user *User) error { //patchUpdating user
 
 	var result = Db.Updates(user)
-	if err := result.Error; err != nil {
+	if err := result.Error; err != nil { //checking for errors
 
 		logger.Error("err update", err)
 		return err
 
 	}
 
-	if result.RowsAffected == 0 {
+	if result.RowsAffected == 0 { //check if any operation affects table
 		logger.Error("err user not found")
 
 		return errors.New("user NOT FOUND")
