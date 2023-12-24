@@ -37,23 +37,23 @@ func RunUp() error {
 
 }
 
-func RunUpMigration(Name string) error {
+func RunUpMigration(Name string) error { //running up for specific migration
 
-	if err := SearchMigration(Name); err == nil {
+	if err := SearchMigration(Name); err == nil { // if it exists doesnt run it again
 		logger.Error(" run up mig has found, run before")
 
 		return err
 
 	}
 	for _, migElement := range migration.Migrations_Arr {
-		if migElement.Name == Name {
-			if err := migElement.UpFn(); err != nil {
+		if migElement.Name == Name { //if found run  it's UpFn
+			if err := migElement.UpFn(); err != nil { //check for upfn err
 				logger.Error(migElement.Name, " up func err")
 				return err
 			}
 
 			if err := InsertMigration(migElement.Name); err != nil {
-				logger.Error("insert err ", migElement.Name)
+				logger.Error("insert err ", migElement.Name) //check for insert err
 				return err
 			}
 
@@ -63,7 +63,7 @@ func RunUpMigration(Name string) error {
 		}
 
 	}
-	logger.Error("Mig not found")
+	logger.Error("Mig not found") // mig Not Found
 	return nil
 
 }
