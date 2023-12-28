@@ -11,11 +11,15 @@ var (
 	UserApi fiber.Router = App.Group("/user")
 )
 
-func init() {
+func ListenPort() {
 
 	err := App.Listen(":3000")
 
 	if err != nil {
 		logger.Fatal("err", err)
 	}
+}
+
+func init() {
+
 }
