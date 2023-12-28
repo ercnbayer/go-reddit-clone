@@ -5,19 +5,19 @@ import (
 	"errors"
 )
 
-type User struct {
+type UserEntity struct {
 	ID       string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Name     string `gorm:"column:name;not null;default:null"`
-	Password string `gorm:"column:password;not null;default:null"`
-	Email    string `gorm:"unique;not null;type:varchar(100);default:null"`
+	Name     string `gorm:"column:name;not null;"`
+	Password string `gorm:"column:password;not null;"`
+	Email    string `gorm:"unique;not null;type:varchar(100);"`
 }
 
 // TableName overrides the table name used by User to `profiles`
-func (table *User) TableName() string {
+func (table *UserEntity) TableName() string {
 	return "users" //set TableName to operate
 }
 
-func InsertUser(user *User) error { //inserting user
+func CreateUser(user *UserEntity) error { //inserting user
 
 	if err := Db.Save(user).Error; err != nil { //checking for errors
 		return err
@@ -29,7 +29,7 @@ func InsertUser(user *User) error { //inserting user
 
 }
 
-func LoginUser(user *User) error { //checking login creds
+func GetUserByEmailAndPassword(user *UserEntity) error { //checking login creds
 
 	if err := Db.Where(" email=? AND password=? ", user.Email, user.Password).First(&user).Error; err != nil {
 		logger.Info("Wrong Creds entry", err)
@@ -42,7 +42,7 @@ func LoginUser(user *User) error { //checking login creds
 
 func DeleteUser(id string) (string, error) { //delete User
 
-	var QueryResult = Db.Delete(&User{ID: id})
+	var QueryResult = Db.Delete(&UserEntity{ID: id})
 
 	if err := QueryResult.Error; err != nil {
 
@@ -60,7 +60,7 @@ func DeleteUser(id string) (string, error) { //delete User
 	return id, nil
 }
 
-func ReadUser(id string, user *User) error {
+func ReadUser(id string, user *UserEntity) error {
 
 	user.ID = id //setting id
 
@@ -71,7 +71,7 @@ func ReadUser(id string, user *User) error {
 	return nil
 }
 
-func PatchUpdateUser(user *User) error { //patchUpdating user
+func UpdateUser(user *UserEntity) error { //patchUpdating user
 
 	var result = Db.Updates(user)
 	if err := result.Error; err != nil { //checking for errors
@@ -92,8 +92,8 @@ func PatchUpdateUser(user *User) error { //patchUpdating user
 
 }
 
-func GetUsers() ([]User, error) {
-	var users []User // creating person arr
+func GetUsers() ([]UserEntity, error) {
+	var users []UserEntity // creating person arr
 	if err := Db.Find(&users).Error; err != nil {
 		//check if err
 		return nil, err

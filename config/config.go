@@ -7,23 +7,54 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type PgDbStruct struct {
-	DbName     string
-	UserName   string
-	DbPassword string
-	DbPort     string
+var DbName string
+var UserName string
+var DbPassword string
+var DbPort string
+
+func getDbName() bool {
+	DbName = os.Getenv("POSTGRES_DB")
+	if DbName == "" {
+		logger.Fatal("Null Value")
+		return false
+
+	}
+	return true
+
 }
+func getUserName() bool {
+	UserName = os.Getenv("POSTGRES_USER")
+	if UserName == "" {
+		logger.Fatal("Null Value db UserName")
+		return false
+	}
+	return true
 
-var PsqlDbConfig PgDbStruct
+}
+func getDbPort() bool {
+	DbPort = os.Getenv("PORT")
+	if DbPort == "" {
+		logger.Fatal("Null Value")
+		return false
 
-func CheckEnvArgs() bool {
+	}
+	return true
 
-	return PsqlDbConfig.DbName == "" || PsqlDbConfig.DbPassword == "" || PsqlDbConfig.UserName == "" || PsqlDbConfig.DbPort == ""
+}
+func getDbPassword() bool {
+	DbPassword = os.Getenv("POSTGRES_PASSWORD")
+	if DbPassword == "" {
+		logger.Fatal("Null Value")
+		return false
+
+	}
+	return true
+
 }
 
 func init() {
 
-	logger.LogLevel = 3
+	logger.LogLevel = logger.AllLogs
 
 	err := godotenv.Load() //load env
 	if err != nil {
@@ -31,14 +62,9 @@ func init() {
 		return
 	}
 
-	PsqlDbConfig.DbName = os.Getenv("POSTGRES_DB") // getting env vars
-	PsqlDbConfig.UserName = os.Getenv("POSTGRES_USER")
-	PsqlDbConfig.DbPassword = os.Getenv("POSTGRES_PASSWORD")
-	PsqlDbConfig.DbPort = os.Getenv("PORT")
-
-	if CheckEnvArgs() {
-
-		logger.Fatal("ENV VALUE EMPTY ")
-	}
+	DbName = "emreddit"   //getDbName()// getting env vars
+	UserName = "postgres" //getUserName()
+	DbPassword = "root"   //getDbPassword()
+	DbPort = "6000"       //getDbPort()
 
 }

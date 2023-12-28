@@ -17,7 +17,7 @@ func init() {
 
 	var err error
 	PostgresConfigString := fmt.Sprintf("host=localhost user=%s password=%s database=%s port=%s sslmode=disable TimeZone=Etc/UTC",
-		config.PsqlDbConfig.UserName, config.PsqlDbConfig.DbPassword, config.PsqlDbConfig.DbName, config.PsqlDbConfig.DbPort)
+		config.UserName, config.DbPassword, config.DbName, config.DbPort)
 
 	Db, err = gorm.Open(postgres.Open(PostgresConfigString), &gorm.Config{}) //connecting gorm
 

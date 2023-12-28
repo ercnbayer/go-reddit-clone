@@ -15,11 +15,11 @@ type Migration struct {
 	SuccessInitLog string
 }
 
-func Init() {
+func Init(FileName string) {
 
 	timestamp := time.Now().Format("20060102150405") //setting time format
 	templateFile := "migration-utils/migration.tmpl" // migration.tmpl's  relative file path
-	fileName := fmt.Sprintf("migration/%s.go", timestamp)
+	fileName := fmt.Sprintf("migration/%s-%s.go", timestamp, FileName)
 
 	migrationFile := []Migration{{Name: "User", Timestamp: timestamp, TableName: "users", SuccessInitLog: "Table Init"}} //creating first migrations
 

@@ -4,7 +4,15 @@ import (
 	"log"
 )
 
-var LogLevel uint8
+type LogLevels int64
+
+const (
+	OnlyFatalLogs = iota + 1
+	ErrorAndFatalLogs
+	AllLogs
+)
+
+var LogLevel LogLevels
 
 func Fatal(v ...interface{}) { //log fatal errors
 

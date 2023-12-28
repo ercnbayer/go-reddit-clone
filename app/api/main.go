@@ -6,13 +6,12 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-var App *fiber.App
+var (
+	App     *fiber.App   = fiber.New()
+	UserApi fiber.Router = App.Group("/user")
+)
 
 func init() {
-
-	App = fiber.New()
-
-	UserInit()
 
 	err := App.Listen(":3000")
 

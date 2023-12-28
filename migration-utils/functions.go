@@ -1,7 +1,7 @@
 package migrationutils
 
 import (
-	"emreddit/db"
+	"emreddit/app/db"
 	"emreddit/logger"
 )
 
