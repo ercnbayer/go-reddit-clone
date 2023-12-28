@@ -143,4 +143,6 @@ func init() { //creating routes
 	UserApi.Patch(":id", updateUser) //update user
 
 	UserApi.Delete(":id", deleteUser) //delete user
+
+	logger.Info("endpoint init api")
 }
