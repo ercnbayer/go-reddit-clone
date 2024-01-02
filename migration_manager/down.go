@@ -1,4 +1,4 @@
-package migrate
+package migration_manager
 
 import (
 	"emreddit/logger"
@@ -7,10 +7,6 @@ import (
 
 func RunDown() error {
 
-	if err := GetMigsFromDB(); err != nil { //getting MigsFrom DB
-		logger.Error("getCommittedMigErr")
-		return err
-	}
 	if err := migration.Migrations_Arr[len(migration.Migrations_Arr)-1].DownFn(); err != nil { //executing down func and  checking for err
 		logger.Error(" DOWN FUNC ERR ", migration.Migrations_Arr[len(migration.Migrations_Arr)-1].Name)
 		return err
@@ -27,12 +23,6 @@ func RunDown() error {
 
 func RunDownMigration(Name string) error { //rundown migration with given name
 
-	if err := SearchMigration(Name); err != nil { //searching for migration if it doesnt exist return err
-		logger.Error("mig has not found")
-
-		return err
-
-	}
 	for _, migElement := range migration.Migrations_Arr {
 		if migElement.Name == Name {
 			if err := migElement.DownFn(); err != nil { // if err happens when executing return err

@@ -13,7 +13,7 @@ type Migration struct {
 
 var Migrations_Arr []Migration
 
-func SortMigArr() {
+func sortMigArr() {
 
 	sort.Slice(Migrations_Arr, func(i, j int) bool {
 
@@ -25,5 +25,5 @@ func SortMigArr() {
 }
 
 func init() {
-
+	sort()
 }

@@ -1,4 +1,4 @@
-package migrationutils
+package migration_manager
 
 import (
 	"emreddit/logger"
@@ -9,10 +9,9 @@ import (
 )
 
 type Migration struct {
-	Name           string
-	Timestamp      string
-	TableName      string
-	SuccessInitLog string
+	Name      string `gorm:"column:name;not null;"`
+	Timestamp string
+	TableName string `gorm:"column:name;not null;"`
 }
 
 func Init(FileName string) {
@@ -21,7 +20,7 @@ func Init(FileName string) {
 	templateFile := "migration-utils/migration.tmpl" // migration.tmpl's  relative file path
 	fileName := fmt.Sprintf("migration/%s-%s.go", timestamp, FileName)
 
-	migrationFile := []Migration{{Name: "User", Timestamp: timestamp, TableName: "users", SuccessInitLog: "Table Init"}} //creating first migrations
+	migrationFile := []Migration{{Name: "User", Timestamp: timestamp, TableName: "users"}} //creating first migrations
 
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
