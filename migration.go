@@ -1,7 +1,7 @@
 package main
 
-import migrationutils "emreddit/migration-utils"
+import "emreddit/migrate"
 
 func main() {
-	migrationutils.RunUp()
+	migrate.RunUp()
 }
