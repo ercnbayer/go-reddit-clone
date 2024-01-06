@@ -15,6 +15,11 @@ type UserUpdatePayload struct { //payload for updating user
 	Password string `validate:"omitempty,required"`
 	Email    string `validate:"omitempty,required,email"`
 }
+type UserProfile struct {
+	ID    string
+	Name  string
+	Email string
+}
 
 func mapUserUpdatePayloadToDbUser(user *UserUpdatePayload, dbUser *db.UserEntity) {
 
@@ -22,6 +27,15 @@ func mapUserUpdatePayloadToDbUser(user *UserUpdatePayload, dbUser *db.UserEntity
 	dbUser.Name = user.Name
 	dbUser.Email = user.Email
 	dbUser.Password = user.Password
+}
+
+func mapUserEntityToUserProfile(dbUser *db.UserEntity) UserProfile {
+
+	var userProfile UserProfile
+	userProfile.ID = dbUser.ID
+	userProfile.Name = dbUser.Name
+	userProfile.Email = dbUser.Email
+	return userProfile
 }
 
 func getUser(c *fiber.Ctx) error {
@@ -39,17 +53,14 @@ func getUser(c *fiber.Ctx) error {
 
 		return c.Status(400).JSON(err.Error())
 	}
+	err, user := app.GetUser(id)
 
-	err = app.GetUser(id) //readingUser
-
-	if err != nil { //check if err is not null
-
-		logger.Error(err.Error(), err)
-
-		return c.Status(404).JSON(err.Error())
+	if err != nil {
+		return c.Status(404).JSON(err)
 	}
 
-	return c.JSON(user) // return it as json
+	// calling app function
+	return c.JSON(mapUserEntityToUserProfile(user)) // return it as json
 
 }
 func deleteUser(c *fiber.Ctx) error {
@@ -108,9 +119,11 @@ func updateUser(c *fiber.Ctx) error {
 
 	var dbUser db.UserEntity
 
-	mapUserUpdatePayloadToDbUser(&user, &dbUser) // maping user to dbUser
+	// maping user to dbUser
 
-	if err := db.UpdateUser(&dbUser); err != nil { //sending it to db
+	mapUserUpdatePayloadToDbUser(&user, &dbUser)
+
+	if err := app.UpdateUser(&dbUser); err != nil {
 
 		logger.Error("Update ERR:", err)
 
@@ -122,7 +135,7 @@ func updateUser(c *fiber.Ctx) error {
 
 func listUsers(c *fiber.Ctx) error {
 
-	people, err := db.GetUsers() //getting all userslist
+	people, err := app.GetUsers() //getting all userslist
 
 	if err != nil {
 

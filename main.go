@@ -1,9 +1,7 @@
 package main
 
 import (
-
-
-	"emreddit/app/api"
+	"emreddit/api"
 )
 
 func main() {
