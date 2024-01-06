@@ -1,6 +1,7 @@
 package api
 
 import (
+	"emreddit/app"
 	db "emreddit/db"
 	"emreddit/logger"
 	"emreddit/validator"
@@ -39,8 +40,7 @@ func getUser(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	var user db.UserEntity
-	err = db.ReadUser(id, &user) //readingUser
+	err = app.GetUser(id) //readingUser
 
 	if err != nil { //check if err is not null
 

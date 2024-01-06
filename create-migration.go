@@ -1,7 +1,7 @@
 package main
 
 import (
-	"emreddit/migrate"
+	"emreddit/migration_manager"
 	"flag"
 )
 
@@ -10,5 +10,5 @@ var fileName string
 func main() {
 	flag.StringVar(&fileName, "name", "", "")
 	flag.Parse()
-	migrate.Init(fileName)
+	migration_manager.Init(fileName)
 }

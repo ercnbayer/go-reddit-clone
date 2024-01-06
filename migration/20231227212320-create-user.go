@@ -1,7 +1,7 @@
 package migration
 
 import (
-	"emreddit/app/db"
+	"emreddit/db"
 	"emreddit/logger"
 )
 

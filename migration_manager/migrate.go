@@ -1,7 +1,7 @@
 package migration_manager
 
 import (
-	"emreddit/app/db"
+	"emreddit/db"
 	"emreddit/logger"
 	"emreddit/migration"
 	"errors"
@@ -58,17 +58,6 @@ func SearchMigration(Name string) error { //searching for specific migration wit
 	}
 	return errors.New("mig doesnt exist " + Name)
 }
-func init() {
-
-	if !db.Db.Migrator().HasTable(&CommittedMigration{}) { //check if migration table exists
-		if err := db.Db.Migrator().CreateTable(&CommittedMigration{}); err != nil {
-			panic("failed to create table")
-		}
-	}
-	if err := getMigsFromDB(); err != nil {
-		panic("no migration exists")
-	}
-}
 
 func RunUp() error {
 
@@ -109,24 +98,36 @@ func RunUpMigration(Name string) error { //running up for specific migration
 
 	}
 	for _, migElement := range migration.Migrations_Arr {
-		if migElement.Name == Name { //if found run  it's UpFn
-			if err := migElement.UpFn(); err != nil { //check for upfn err
+		if migElement.Name == Name {
+			if err := migElement.UpFn(); err != nil {
 				logger.Error(migElement.Name, " up func err")
 				return err
 			}
 
 			if err := InsertMigration(migElement.Name); err != nil {
-				logger.Error("insert err ", migElement.Name) //check for insert err
+				logger.Error("insert err ", migElement.Name)
 				return err
 			}
 
 			logger.Info("INSERTED NEW MIGRATION", migElement.Name)
 			return nil //
-			// String found in the struct array
+
 		}
 
 	}
 	logger.Error("Mig not found") // mig Not Found
 	return nil
 
+}
+
+func init() {
+
+	if !db.Db.Migrator().HasTable(&CommittedMigration{}) { //check if migration table exists
+		if err := db.Db.Migrator().CreateTable(&CommittedMigration{}); err != nil {
+			panic("failed to create table")
+		}
+	}
+	if err := getMigsFromDB(); err != nil {
+		panic("no migration exists")
+	}
 }

@@ -28,7 +28,7 @@ package migration
 	func init() {
 	
 		Migrations_Arr = append(Migrations_Arr, Migration{
-			Name:   "{{.Name}}{{.Timestamp}}",
+			Name:   "{{.Timestamp}}{{.Name}}",
 			UpFn:   {{.Name}}Up{{.Timestamp}},
 			DownFn: {{.Name}}Down{{.Timestamp}},
 		})

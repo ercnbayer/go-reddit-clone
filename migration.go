@@ -1,7 +1,7 @@
 package main
 
-import "emreddit/migrate"
+import "emreddit/migration_manager"
 
 func main() {
-	migrate.RunUp()
+	migration_manager.RunUp()
 }

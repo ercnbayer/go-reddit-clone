@@ -25,5 +25,5 @@ func sortMigArr() {
 }
 
 func init() {
-	sort()
+	sortMigArr()
 }
