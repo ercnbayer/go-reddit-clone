@@ -21,17 +21,18 @@ func (table *CommittedMigration) TableName() string {
 
 func InsertMigration(Name string) error {
 
-	if err := db.Db.Save(&CommittedMigration{Name: Name}).Error; err != nil { // inserting migration
+	// inserting migration
+	if err := db.Db.Save(&CommittedMigration{Name: Name}).Error; err != nil {
 		return err
 	}
 
-	logger.Info(Name, "has been saved")
+	logger.Info(Name, "<?> has been saved")
 	return nil
 }
 
 func DeleteMigration(Name string) error {
-
-	err := db.Db.Where("Name=?", Name).Delete(&CommittedMigration{}).Error //deleting migration
+	//deleting migration
+	err := db.Db.Where("Name=?", Name).Delete(&CommittedMigration{}).Error
 
 	if err != nil {
 		logger.Info("delete err", Name)
@@ -41,7 +42,9 @@ func DeleteMigration(Name string) error {
 	logger.Info("deleted", Name)
 	return nil
 }
-func getMigsFromDB() error { //getting migrations from db
+
+// getting migrations from db
+func getMigsFromDB() error {
 	if err := db.Db.Find(&CommittedMigs).Error; err != nil {
 		//check if err
 		return err
@@ -50,7 +53,8 @@ func getMigsFromDB() error { //getting migrations from db
 	return nil
 }
 
-func SearchMigration(Name string) error { //searching for specific migration with Name
+// searching for specific migration with Name
+func SearchMigration(Name string) error {
 	for _, CommittedMig := range CommittedMigs {
 		if CommittedMig.Name == Name {
 			return nil
@@ -89,10 +93,12 @@ func RunUp() error {
 
 }
 
-func RunUpMigration(Name string) error { //running up for specific migration
+// running up for specific migration
+func RunUpMigration(Name string) error {
 
-	if err := SearchMigration(Name); err == nil { // if it exists doesnt run it again
-		logger.Error(" run up mig has found, run before")
+	// if it exists doesnt run it again
+	if err := SearchMigration(Name); err == nil {
+		logger.Error(" run up mig has found <?>, run before", Name)
 
 		return err
 
@@ -115,7 +121,70 @@ func RunUpMigration(Name string) error { //running up for specific migration
 		}
 
 	}
-	logger.Error("Mig not found") // mig Not Found
+	logger.Error("Error:Mig not found in Run Time Array")
+	return nil
+
+}
+
+func RunDown() error {
+
+	for _, migElement := range migration.Migrations_Arr {
+
+		var err error = nil
+		if err = SearchMigration(migElement.Name); err != nil {
+			logger.Info("Migration has not found, Never Inserted before")
+
+			return err
+
+		}
+
+		if err := migElement.DownFn(); err != nil {
+			logger.Error(migElement.Name, " Migration Down Function Error: <?>", err)
+			return err
+		}
+
+		if err := InsertMigration(migElement.Name); err != nil {
+			logger.Error("insert err ", migElement.Name)
+			return err
+		}
+
+		logger.Info("INSERTED NEW MIGRATION", migElement.Name) // insert
+
+	}
+
+	return nil
+
+}
+
+// Run Down Migration With Given Name
+func RunDownMigration(Name string) error {
+
+	// if it exists doesnt run it again
+	if err := SearchMigration(Name); err != nil {
+		logger.Error(" Migration has not found <?>, Run Up Function before", Name)
+
+		return err
+
+	}
+	for _, migElement := range migration.Migrations_Arr {
+		if migElement.Name == Name {
+			if err := migElement.DownFn(); err != nil {
+				logger.Error(migElement.Name, "Migration Down Function Error due to <?>", err)
+				return err
+			}
+
+			if err := DeleteMigration(migElement.Name); err != nil {
+				logger.Error("Migration Cannot Be Deleted Due To <?> ", err, migElement.Name)
+				return err
+			}
+
+			logger.Info("Migration deleted  <?>", migElement.Name)
+			return nil //
+
+		}
+
+	}
+	logger.Error("Migration Not Found In Run Time Arr")
 	return nil
 
 }

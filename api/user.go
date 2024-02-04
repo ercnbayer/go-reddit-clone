@@ -43,7 +43,7 @@ func getUser(c *fiber.Ctx) error {
 	//getting single user
 
 	// Get the ID from the URL parameter
-	id := c.Params("id") // getting id from params
+	id := c.Params("id")
 
 	err := validator.ValidateUUID(id) //validating id
 
@@ -63,6 +63,7 @@ func getUser(c *fiber.Ctx) error {
 	return c.JSON(mapUserEntityToUserProfile(user)) // return it as json
 
 }
+
 func deleteUser(c *fiber.Ctx) error {
 
 	id := c.Params("id") // getting id from params
@@ -91,7 +92,7 @@ func updateUser(c *fiber.Ctx) error {
 
 	id := c.Params("id") //getting id from params
 
-	err := validator.ValidateUUID(id) //validating id
+	err := validator.ValidateUUID(id)
 
 	if err != nil {
 

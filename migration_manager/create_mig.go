@@ -16,11 +16,11 @@ type Migration struct {
 
 func Init(FileName string) {
 
-	timestamp := time.Now().Format("20060102150405") //setting time format
-	templateFile := "migration-utils/migration.tmpl" // migration.tmpl's  relative file path
+	timestamp := time.Now().Format("20060102150405")
+	templateFile := "migration_manager/migration.tmpl"
 	fileName := fmt.Sprintf("migration/%s-%s.go", timestamp, FileName)
 
-	migrationFile := []Migration{{Name: "User", Timestamp: timestamp, TableName: "users"}} //creating first migrations
+	migrationFile := []Migration{{Name: "User", Timestamp: timestamp, TableName: "users"}}
 
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
@@ -28,13 +28,12 @@ func Init(FileName string) {
 		logger.Error(err.Error())
 	}
 
-	File, err := os.Create(fileName) //creating file
-
+	File, err := os.Create(fileName)
 	if err != nil {
 		logger.Error(err)
 	}
 
-	err = tmpl.Execute(File, migrationFile) //executing tmpl
+	err = tmpl.Execute(File, migrationFile)
 
 	if err != nil {
 
@@ -44,6 +43,5 @@ func Init(FileName string) {
 	}
 
 	File.Close()
-	// end main
 
 }

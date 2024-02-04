@@ -16,7 +16,7 @@ func ListenPort() {
 	err := App.Listen(":3000")
 
 	if err != nil {
-		logger.Fatal("err", err)
+		logger.Fatal("Error: <?>", err)
 	}
 }
 

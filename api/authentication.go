@@ -1,6 +1,7 @@
 package api
 
 import (
+	"emreddit/app"
 	db "emreddit/db"
 	"emreddit/logger"
 	"emreddit/validator"
@@ -41,7 +42,7 @@ func registerUser(c *fiber.Ctx) error { // for registering user
 
 	if err := c.BodyParser(&user); err != nil { //parsing body
 
-		logger.Error("BodyParsing err:", user)
+		logger.Error("BodyParsing err <?>", user)
 		return c.Status(400).JSON(err.Error())
 	}
 
@@ -53,9 +54,9 @@ func registerUser(c *fiber.Ctx) error { // for registering user
 
 	mapUserPayloadToDbUserCreate(&user, &dbUser) //maping to db obj
 
-	if err := db.CreateUser(&dbUser); err != nil { //Inserting user
+	if err := app.CreateUser(&dbUser); err != nil { //Inserting user
 
-		logger.Error("User Insert Err", err)
+		logger.Error("Error <?>	", err)
 
 		return c.Status(400).JSON(err.Error())
 
@@ -84,7 +85,7 @@ func userLogin(c *fiber.Ctx) error {
 
 	mapUserLoginPayloadToDbUser(&user, &dbUser) //maping user to db obj
 
-	if err := db.GetUserByEmailAndPassword(&dbUser); err != nil { // sending it to db
+	if err := app.UserLogin(&dbUser); err != nil { // sending it to db
 
 		logger.Error("login err", err)
 
@@ -100,5 +101,4 @@ func init() {
 	UserApi.Post("/", registerUser)
 	UserApi.Post("/login", userLogin)
 
-	logger.Info("endpoint init auth")
 }
