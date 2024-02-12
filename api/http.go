@@ -19,7 +19,3 @@ func ListenPort() {
 		logger.Fatal("Error: <?>", err)
 	}
 }
-
-func init() {
-
-}
