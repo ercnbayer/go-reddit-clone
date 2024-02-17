@@ -5,7 +5,7 @@ import (
 	"emreddit/logger"
 )
 
-func CreateUser(user *db.UserEntity) error {
+func RegisterUser(user *db.UserEntity) error {
 
 	err := db.CreateUser(user)
 

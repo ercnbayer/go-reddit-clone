@@ -54,7 +54,7 @@ func registerUser(c *fiber.Ctx) error { // for registering user
 
 	mapUserPayloadToDbUserCreate(&user, &dbUser) //maping to db obj
 
-	if err := app.CreateUser(&dbUser); err != nil { //Inserting user
+	if err := app.RegisterUser(&dbUser); err != nil { //Inserting user
 
 		logger.Error("Error <?>	", err)
 
