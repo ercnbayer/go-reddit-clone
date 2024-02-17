@@ -4,6 +4,7 @@ import (
 	"emreddit/db"
 	"emreddit/logger"
 	"emreddit/migration"
+	"errors"
 )
 
 type CommittedMigration struct {
@@ -11,7 +12,7 @@ type CommittedMigration struct {
 	Name string `gorm:"unique;column:name;not null;"`
 }
 
-//var CommittedMigs []CommittedMigration no longer neccessary i hope
+var CommittedMigs []CommittedMigration
 
 func (table *CommittedMigration) TableName() string {
 
@@ -25,7 +26,7 @@ func InsertMigration(Name string) error {
 		return err
 	}
 
-	logger.Info(Name, "<?> has been saved")
+	logger.Info(Name, " has been saved")
 	return nil
 }
 
@@ -43,19 +44,9 @@ func DeleteMigration(Name string) error {
 }
 
 // getting migrations from db
-/*func getMigsFromDB() error {
+func getMigsFromDB() error {
 	if err := db.Db.Find(&CommittedMigs).Error; err != nil {
 		//check if err
-		return err
-	}
-
-	return nil
-}*/
-
-func SearchMigration(Name string) error {
-	commitedMig := CommittedMigration{Name: Name}
-	if err := db.Db.Where("Name =?", Name).First(&commitedMig).Error; err != nil {
-		logger.Info(err)
 		return err
 	}
 
@@ -63,14 +54,14 @@ func SearchMigration(Name string) error {
 }
 
 // searching for specific migration with Name
-/*func SearchMigration(Name string) error {
+func SearchMigration(Name string) error {
 	for _, CommittedMig := range CommittedMigs {
 		if CommittedMig.Name == Name {
 			return nil
 		}
 	}
 	return errors.New("mig doesnt exist " + Name)
-}*/
+}
 
 func RunUp() error {
 
@@ -107,7 +98,7 @@ func RunUpMigration(Name string) error {
 
 	// if it exists doesnt run it again
 	if err := SearchMigration(Name); err == nil {
-		logger.Error(" run up mig has found <?>, run before", Name)
+		logger.Error(" run up mig has found <?> run before", Name)
 
 		return err
 
@@ -204,7 +195,7 @@ func init() {
 			panic("failed to create table")
 		}
 	}
-	/*if err := getMigsFromDB(); err != nil {
+	if err := getMigsFromDB(); err != nil {
 		panic("no migration exists")
-	}*/
+	}
 }
