@@ -11,7 +11,7 @@ type CommittedMigration struct {
 	Name string `gorm:"unique;column:name;not null;"`
 }
 
-var CommittedMigs []CommittedMigration
+//var CommittedMigs []CommittedMigration no longer neccessary i hope
 
 func (table *CommittedMigration) TableName() string {
 
@@ -43,18 +43,19 @@ func DeleteMigration(Name string) error {
 }
 
 // getting migrations from db
-func getMigsFromDB() error {
+/*func getMigsFromDB() error {
 	if err := db.Db.Find(&CommittedMigs).Error; err != nil {
 		//check if err
 		return err
 	}
 
 	return nil
-}
+}*/
 
 func SearchMigration(Name string) error {
-
-	if err := db.Db.Where("Name =?", Name).First(&CommittedMigs).Error; err != nil {
+	commitedMig := CommittedMigration{Name: Name}
+	if err := db.Db.Where("Name =?", Name).First(&commitedMig).Error; err != nil {
+		logger.Info(err)
 		return err
 	}
 
@@ -167,7 +168,6 @@ func RunDown() error {
 // Run Down Migration With Given Name
 func RunDownMigration(Name string) error {
 
-	// if it exists doesnt run it again
 	if err := SearchMigration(Name); err != nil {
 		logger.Error(" Migration has not found <?>, Run Up Function before", Name)
 
@@ -204,7 +204,7 @@ func init() {
 			panic("failed to create table")
 		}
 	}
-	if err := getMigsFromDB(); err != nil {
+	/*if err := getMigsFromDB(); err != nil {
 		panic("no migration exists")
-	}
+	}*/
 }
