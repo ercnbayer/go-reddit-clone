@@ -8,7 +8,6 @@ import (
 )
 
 type CommittedMigration struct {
-	ID   string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
 	Name string `gorm:"unique;column:name;not null;"`
 }
 
@@ -22,7 +21,7 @@ func (table *CommittedMigration) TableName() string {
 func InsertMigration(Name string) error {
 
 	// inserting migration
-	if err := db.Db.Save(&CommittedMigration{Name: Name}).Error; err != nil {
+	if err := db.Db.Create(&CommittedMigration{Name: Name}).Error; err != nil {
 		return err
 	}
 
