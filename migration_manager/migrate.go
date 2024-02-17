@@ -4,7 +4,6 @@ import (
 	"emreddit/db"
 	"emreddit/logger"
 	"emreddit/migration"
-	"errors"
 )
 
 type CommittedMigration struct {
@@ -53,15 +52,24 @@ func getMigsFromDB() error {
 	return nil
 }
 
-// searching for specific migration with Name
 func SearchMigration(Name string) error {
+
+	if err := db.Db.Where("Name =?", Name).First(&CommittedMigs).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// searching for specific migration with Name
+/*func SearchMigration(Name string) error {
 	for _, CommittedMig := range CommittedMigs {
 		if CommittedMig.Name == Name {
 			return nil
 		}
 	}
 	return errors.New("mig doesnt exist " + Name)
-}
+}*/
 
 func RunUp() error {
 
@@ -143,12 +151,12 @@ func RunDown() error {
 			return err
 		}
 
-		if err := InsertMigration(migElement.Name); err != nil {
-			logger.Error("insert err ", migElement.Name)
+		if err := DeleteMigration(migElement.Name); err != nil {
+			logger.Error("Delete err <?> ", migElement.Name)
 			return err
 		}
 
-		logger.Info("INSERTED NEW MIGRATION", migElement.Name) // insert
+		logger.Info("Deleted Migration", migElement.Name) // insert
 
 	}
 
