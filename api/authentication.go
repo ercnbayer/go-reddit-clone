@@ -87,7 +87,7 @@ func userLogin(c *fiber.Ctx) error {
 
 	if err := app.UserLogin(&dbUser); err != nil { // sending it to db
 
-		logger.Error("login err", err)
+		logger.Error("login err <?>", err)
 
 		return c.Status(404).JSON(err.Error())
 	}
