@@ -53,7 +53,7 @@ func getUser(c *fiber.Ctx) error {
 
 		return c.Status(400).JSON(err.Error())
 	}
-	err, user := app.GetUser(id)
+	user, err := app.GetUser(id)
 
 	if err != nil {
 		return c.Status(404).JSON(err)
@@ -157,6 +157,5 @@ func init() { //creating routes
 	UserApi.Patch(":id", updateUser) //update user
 
 	UserApi.Delete(":id", deleteUser) //delete user
-
 	logger.Info("endpoint init api")
 }
