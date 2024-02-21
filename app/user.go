@@ -4,13 +4,13 @@ import (
 	"emreddit/db"
 )
 
-func GetUser(id string) (error, *db.UserEntity) {
-	var user *db.UserEntity
+func GetUser(id string) (*db.UserEntity, error) {
+	var user *db.UserEntity = new(db.UserEntity)
 	err := db.ReadUser(id, user)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
-	return nil, user
+	return user, err
 }
 func UpdateUser(dbUser *db.UserEntity) error {
 
