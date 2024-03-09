@@ -92,13 +92,35 @@ func userLogin(c *fiber.Ctx) error {
 		return c.Status(404).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(dbUser.ID)
+	token, err := app.CreateJWT(dbUser.ID)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(token)
 
+}
+func me(c *fiber.Ctx) error {
+
+	tokenString := c.Params("token")
+	id, err := app.ParseJWT(tokenString)
+	if err != nil {
+		logger.Error("JWT Token Error:<?>", err)
+		return c.Status(400).JSON(err.Error())
+	}
+
+	user, err := app.GetUser(id)
+
+	if err != nil {
+		logger.Error("Get User Error:<?>", err)
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(&user)
 }
 
 func init() {
 
 	UserApi.Post("/", registerUser)
-	UserApi.Post("/login", userLogin)
+	AuthApi.Post("/login", userLogin)
+	AuthApi.Get("/me/:token", me)
 
 }
