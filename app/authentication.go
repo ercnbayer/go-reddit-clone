@@ -36,9 +36,10 @@ func CreateJWT(id string) (string, error) {
 
 	var expire_date = time.Minute * 15
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":     time.Now().Add(expire_date).Unix(), //15 dk üret
+		"exp":     time.Now().Add(expire_date).Unix(),
 		"iat":     time.Now().Unix(),
-		"subject": id})
+		"subject": id,
+	})
 
 	ss, err := token.SignedString([]byte(config.JWTKey))
 

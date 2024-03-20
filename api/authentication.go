@@ -103,6 +103,7 @@ func me(c *fiber.Ctx) error {
 
 	var tokenString = c.Get("X-Auth-Token", "null")
 	id, err := app.ParseJWT(tokenString)
+
 	if err != nil {
 		logger.Error("JWT Token Error:<?>", err)
 		return c.Status(400).JSON(err.Error())
@@ -121,6 +122,6 @@ func init() {
 
 	UserApi.Post("/", registerUser)
 	AuthApi.Post("/login", userLogin)
-	AuthApi.Get("/me/:token", me)
+	AuthApi.Get("/me", me)
 
 }
