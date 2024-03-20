@@ -51,7 +51,7 @@ func CreateJWT(id string) (string, error) {
 	//base64le encode
 	return ss, nil
 } //jwt token ise 401 // 401
-func EncryptedToken(id string) {
+func EncryptToken(id string) {
 	//kullanıcı token // jwt token
 }
 
