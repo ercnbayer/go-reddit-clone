@@ -62,10 +62,12 @@ func ParseJWT(tokenString string) (string, error) {
 
 		return []byte(config.JWTKey), nil
 	})
+
 	if err != nil {
 		logger.Error(err)
 		return "", err
 	}
+
 	var id string
 	if _, ok := token.Claims.(jwt.MapClaims); ok {
 		id, err = token.Claims.GetSubject()
