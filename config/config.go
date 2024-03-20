@@ -87,5 +87,6 @@ func init() {
 	DbPassword = "root"   //getDbPassword()
 	DbPort = "6000"       //getDbPort()
 	getJWTKey()
+	getListenPort()
 
 }
