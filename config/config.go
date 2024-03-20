@@ -56,7 +56,7 @@ func getDbPassword() bool {
 func getListenPort() bool {
 	ListenPort = os.Getenv("LISTEN_PORT")
 	if ListenPort == "" {
-		logger.Fatal("Null Value")
+		logger.Fatal("Null Value ListenPort")
 		return false
 
 	}
@@ -64,7 +64,7 @@ func getListenPort() bool {
 }
 func getJWTKey() bool {
 	JWTKey = os.Getenv("JWTKEY")
-	if ListenPort == "" {
+	if JWTKey == "" {
 		logger.Fatal("Null Value")
 		return false
 
