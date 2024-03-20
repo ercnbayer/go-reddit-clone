@@ -25,12 +25,12 @@ func Init(FileName string) {
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {
 		//panic(err)
-		logger.Error(err.Error())
+		logger.Fatal(err.Error())
 	}
 
 	File, err := os.Create(fileName)
 	if err != nil {
-		logger.Error(err)
+		logger.Fatal(err)
 	}
 
 	err = tmpl.Execute(File, migrationFile)
