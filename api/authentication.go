@@ -101,7 +101,7 @@ func userLogin(c *fiber.Ctx) error {
 }
 func me(c *fiber.Ctx) error {
 
-	tokenString := c.Params("token")
+	var tokenString = c.Get("X-Auth-Token", "null")
 	id, err := app.ParseJWT(tokenString)
 	if err != nil {
 		logger.Error("JWT Token Error:<?>", err)
