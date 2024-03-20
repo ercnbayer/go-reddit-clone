@@ -1,6 +1,7 @@
 package api
 
 import (
+	"emreddit/config"
 	"emreddit/logger"
 
 	"github.com/gofiber/fiber/v2"
@@ -14,7 +15,7 @@ var (
 
 func ListenPort() {
 
-	if err := App.Listen(":3000"); err != nil {
+	if err := App.Listen(config.ListenPort); err != nil {
 		logger.Fatal("Error: <?>", err)
 	}
 }

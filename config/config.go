@@ -11,6 +11,8 @@ var DbName string
 var UserName string
 var DbPassword string
 var DbPort string
+var ListenPort string
+var JWTKey string
 
 func getDbName() bool {
 	DbName = os.Getenv("POSTGRES_DB")
@@ -51,6 +53,24 @@ func getDbPassword() bool {
 	return true
 
 }
+func getListenPort() bool {
+	ListenPort = os.Getenv("LISTEN_PORT")
+	if ListenPort == "" {
+		logger.Fatal("Null Value")
+		return false
+
+	}
+	return true
+}
+func getJWTKey() bool {
+	JWTKey = os.Getenv("JWTKEY")
+	if ListenPort == "" {
+		logger.Fatal("Null Value")
+		return false
+
+	}
+	return true
+}
 
 func init() {
 
@@ -66,5 +86,6 @@ func init() {
 	UserName = "postgres" //getUserName()
 	DbPassword = "root"   //getDbPassword()
 	DbPort = "6000"       //getDbPort()
+	getJWTKey()
 
 }

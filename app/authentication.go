@@ -1,6 +1,7 @@
 package app
 
 import (
+	"emreddit/config"
 	"emreddit/db"
 	"emreddit/logger"
 	"errors"
@@ -8,8 +9,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 )
-
-var KEY = "THIS IS A KEY"
 
 func RegisterUser(user *db.UserEntity) error {
 
@@ -41,7 +40,7 @@ func CreateJWT(id string) (string, error) {
 		"iat":     time.Now().Unix(),
 		"subject": id})
 
-	ss, err := token.SignedString([]byte(KEY))
+	ss, err := token.SignedString([]byte(config.JWTKey))
 
 	if err != nil {
 		logger.Error("JWT Generate Error:<?>", err)
@@ -64,7 +63,7 @@ func ParseJWT(tokenString string) (string, error) {
 			return nil, errors.New("unexpected signing method")
 		}
 
-		return []byte(KEY), nil
+		return []byte(config.JWTKey), nil
 	})
 	if err != nil {
 		logger.Error(err)
