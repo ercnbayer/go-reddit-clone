@@ -75,7 +75,7 @@ func ParseJWT(tokenString string) (string, error) {
 		}
 
 	} else {
-		logger.Error("Error:?", err)
+		logger.Error("Error <?>", err)
 	}
 
 	return id, nil
