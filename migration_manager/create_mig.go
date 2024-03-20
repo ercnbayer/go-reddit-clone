@@ -11,7 +11,7 @@ import (
 type Migration struct {
 	Name      string `gorm:"column:name;not null;"`
 	Timestamp string
-	TableName string `gorm:"column:name;not null;"`
+	TableName string
 }
 
 func Init(FileName string) {
