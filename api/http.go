@@ -1,6 +1,7 @@
 package api
 
 import (
+	"emreddit/config"
 	"emreddit/logger"
 
 	"github.com/gofiber/fiber/v2"
@@ -9,17 +10,12 @@ import (
 var (
 	App     *fiber.App   = fiber.New()
 	UserApi fiber.Router = App.Group("/user")
+	AuthApi fiber.Router = App.Group("/auth")
 )
 
 func ListenPort() {
 
-	err := App.Listen(":3000")
-
-	if err != nil {
-		logger.Fatal("err", err)
+	if err := App.Listen(config.ListenPort); err != nil {
+		logger.Fatal("Error: <?>", err)
 	}
-}
-
-func init() {
-
 }

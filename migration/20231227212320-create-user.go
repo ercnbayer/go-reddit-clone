@@ -1,8 +1,7 @@
 package migration
 
 import (
-	"emreddit/app/db"
-	"emreddit/logger"
+	"emreddit/db"
 )
 
 type User20231227212320 struct {
@@ -31,6 +30,5 @@ func init() {
 		UpFn:   UserUp20231227212320,
 		DownFn: UserDown20231227212320,
 	})
-	logger.Info("Table Init")
 
 }

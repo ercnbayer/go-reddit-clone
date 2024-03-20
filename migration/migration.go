@@ -13,11 +13,11 @@ type Migration struct {
 
 var Migrations_Arr []Migration
 
-func SortMigArr() {
+func sortMigArr() {
 
 	sort.Slice(Migrations_Arr, func(i, j int) bool {
-
-		v1 := reflect.ValueOf(Migrations_Arr[i]).FieldByName("Name") // sort according to name
+		//sort according to name
+		v1 := reflect.ValueOf(Migrations_Arr[i]).FieldByName("Name")
 		v2 := reflect.ValueOf(Migrations_Arr[j]).FieldByName("Name")
 		return v1.String() < v2.String()
 	})
@@ -25,5 +25,7 @@ func SortMigArr() {
 }
 
 func init() {
+	//for sorting mig's alphabetically
+	sortMigArr()
 
 }

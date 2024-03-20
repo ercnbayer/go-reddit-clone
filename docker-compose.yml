@@ -3,9 +3,9 @@ services:
   db:
     image: postgres:15.4
     environment:
-      POSTGRES_DB: $POSTGRES_DB
-      POSTGRES_USER: $POSTGRES_USER
-      POSTGRES_PASSWORD: $POSTGRES_PASSWORD  # Replace with your desired password
+      POSTGRES_DB: emreddit
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root  # $POSTGRES_PASSWORD  # Replace with your desired password
     ports:
       - "6000:5432"
     volumes:

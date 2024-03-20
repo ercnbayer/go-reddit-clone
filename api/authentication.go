@@ -1,7 +1,8 @@
 package api
 
 import (
-	db "emreddit/app/db"
+	"emreddit/app"
+	db "emreddit/db"
 	"emreddit/logger"
 	"emreddit/validator"
 
@@ -41,7 +42,7 @@ func registerUser(c *fiber.Ctx) error { // for registering user
 
 	if err := c.BodyParser(&user); err != nil { //parsing body
 
-		logger.Error("BodyParsing err:", user)
+		logger.Error("BodyParsing err <?>", user)
 		return c.Status(400).JSON(err.Error())
 	}
 
@@ -53,9 +54,9 @@ func registerUser(c *fiber.Ctx) error { // for registering user
 
 	mapUserPayloadToDbUserCreate(&user, &dbUser) //maping to db obj
 
-	if err := db.CreateUser(&dbUser); err != nil { //Inserting user
+	if err := app.RegisterUser(&dbUser); err != nil { //Inserting user
 
-		logger.Error("User Insert Err", err)
+		logger.Error("Error <?>	", err)
 
 		return c.Status(400).JSON(err.Error())
 
@@ -84,21 +85,43 @@ func userLogin(c *fiber.Ctx) error {
 
 	mapUserLoginPayloadToDbUser(&user, &dbUser) //maping user to db obj
 
-	if err := db.GetUserByEmailAndPassword(&dbUser); err != nil { // sending it to db
+	if err := app.UserLogin(&dbUser); err != nil { // sending it to db
 
-		logger.Error("login err", err)
+		logger.Error("login err <?>", err)
 
 		return c.Status(404).JSON(err.Error())
 	}
 
-	return c.Status(200).JSON(dbUser.ID)
+	token, err := app.CreateJWT(dbUser.ID)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(token)
 
+}
+func me(c *fiber.Ctx) error {
+
+	var tokenString = c.Get("X-Auth-Token", "null")
+	id, err := app.ParseJWT(tokenString)
+
+	if err != nil {
+		logger.Error("JWT Token Error:<?>", err)
+		return c.Status(400).JSON(err.Error())
+	}
+
+	user, err := app.GetUser(id)
+
+	if err != nil {
+		logger.Error("Get User Error:<?>", err)
+		return c.Status(400).JSON(err.Error())
+	}
+	return c.Status(200).JSON(&user)
 }
 
 func init() {
 
 	UserApi.Post("/", registerUser)
-	UserApi.Post("/login", userLogin)
+	AuthApi.Post("/login", userLogin)
+	AuthApi.Get("/me", me)
 
-	logger.Info("endpoint init auth")
 }

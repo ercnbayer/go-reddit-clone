@@ -1,7 +1,8 @@
 package api
 
 import (
-	db "emreddit/app/db"
+	"emreddit/app"
+	db "emreddit/db"
 	"emreddit/logger"
 	"emreddit/validator"
 
@@ -14,6 +15,11 @@ type UserUpdatePayload struct { //payload for updating user
 	Password string `validate:"omitempty,required"`
 	Email    string `validate:"omitempty,required,email"`
 }
+type UserProfile struct {
+	ID    string
+	Name  string
+	Email string
+}
 
 func mapUserUpdatePayloadToDbUser(user *UserUpdatePayload, dbUser *db.UserEntity) {
 
@@ -23,12 +29,21 @@ func mapUserUpdatePayloadToDbUser(user *UserUpdatePayload, dbUser *db.UserEntity
 	dbUser.Password = user.Password
 }
 
+func mapUserEntityToUserProfile(dbUser *db.UserEntity) UserProfile {
+
+	var userProfile UserProfile
+	userProfile.ID = dbUser.ID
+	userProfile.Name = dbUser.Name
+	userProfile.Email = dbUser.Email
+	return userProfile
+}
+
 func getUser(c *fiber.Ctx) error {
 
 	//getting single user
 
 	// Get the ID from the URL parameter
-	id := c.Params("id") // getting id from params
+	id := c.Params("id")
 
 	err := validator.ValidateUUID(id) //validating id
 
@@ -38,20 +53,17 @@ func getUser(c *fiber.Ctx) error {
 
 		return c.Status(400).JSON(err.Error())
 	}
+	user, err := app.GetUser(id)
 
-	var user db.UserEntity
-	err = db.ReadUser(id, &user) //readingUser
-
-	if err != nil { //check if err is not null
-
-		logger.Error(err.Error(), err)
-
-		return c.Status(404).JSON(err.Error())
+	if err != nil {
+		return c.Status(404).JSON(err)
 	}
 
-	return c.JSON(user) // return it as json
+	// calling app function
+	return c.JSON(mapUserEntityToUserProfile(user)) // return it as json
 
 }
+
 func deleteUser(c *fiber.Ctx) error {
 
 	id := c.Params("id") // getting id from params
@@ -80,7 +92,7 @@ func updateUser(c *fiber.Ctx) error {
 
 	id := c.Params("id") //getting id from params
 
-	err := validator.ValidateUUID(id) //validating id
+	err := validator.ValidateUUID(id)
 
 	if err != nil {
 
@@ -108,9 +120,11 @@ func updateUser(c *fiber.Ctx) error {
 
 	var dbUser db.UserEntity
 
-	mapUserUpdatePayloadToDbUser(&user, &dbUser) // maping user to dbUser
+	// maping user to dbUser
 
-	if err := db.UpdateUser(&dbUser); err != nil { //sending it to db
+	mapUserUpdatePayloadToDbUser(&user, &dbUser)
+
+	if err := app.UpdateUser(&dbUser); err != nil {
 
 		logger.Error("Update ERR:", err)
 
@@ -122,7 +136,7 @@ func updateUser(c *fiber.Ctx) error {
 
 func listUsers(c *fiber.Ctx) error {
 
-	people, err := db.GetUsers() //getting all userslist
+	people, err := app.GetUsers() //getting all userslist
 
 	if err != nil {
 
@@ -144,5 +158,4 @@ func init() { //creating routes
 
 	UserApi.Delete(":id", deleteUser) //delete user
 
-	logger.Info("endpoint init api")
 }
