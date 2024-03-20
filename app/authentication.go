@@ -33,10 +33,10 @@ func UserLogin(user *db.UserEntity) error {
 }
 
 func CreateJWT(id string) (string, error) {
-	//logine de ek olarak tek kullanılımlık refresh token uret 1-2 saat veya 1 gün
-	//bunlar bir keyle şifreleniyor +jwt tokenle olacak bicimde // tek bir string dönüyorsun bunu da base64lemen dönüyor
+
+	var expire_date = time.Minute * 15
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp":     time.Now().Add(time.Hour).Unix(), //15 dk üret
+		"exp":     time.Now().Add(expire_date).Unix(), //15 dk üret
 		"iat":     time.Now().Unix(),
 		"subject": id})
 
@@ -47,18 +47,14 @@ func CreateJWT(id string) (string, error) {
 		return "", err
 	}
 	logger.Info(token.Header)
-	//base64le encode
+
 	return ss, nil
-} //jwt token ise 401 // 401
-func EncryptToken(id string) {
-	//kullanıcı token // jwt token
 }
 
-// bunlara ek olarak refresh token olustur bunu db de yaz
 func ParseJWT(tokenString string) (string, error) {
-	//base64 decode ekle
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		// Don't forget to validate the alg is what you expect:
+
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
@@ -83,5 +79,3 @@ func ParseJWT(tokenString string) (string, error) {
 
 	return id, nil
 }
-
-//yeni bir endpoint apiye eklenecek
