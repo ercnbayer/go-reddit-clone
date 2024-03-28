@@ -1,10 +1,11 @@
 package main
 
 import (
-	"emreddit/cmd"
+	"emreddit/api"
 )
 
 func main() {
 
-	cmd.Execute()
+	//cmd.Execute()
+	api.ListenPort()
 }

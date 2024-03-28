@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	apicmd "emreddit/cmd/api-cmd"
 	createmigrationcmd "emreddit/cmd/create-migration-cmd"
 	migration_cmd "emreddit/cmd/migration-cmd"
 	"os"
@@ -37,7 +36,6 @@ func addSubCommands() {
 	rootCmd.AddCommand(migration_cmd.MigManagerUp)
 	rootCmd.AddCommand(migration_cmd.MigManagerDown)
 	rootCmd.AddCommand(createmigrationcmd.CreateMigration)
-	rootCmd.AddCommand(apicmd.RunApi)
 }
 func init() {
 	// Here you will define your flags and configuration settings.
