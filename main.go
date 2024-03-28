@@ -1,9 +1,13 @@
+/*
+Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+*/
 package main
 
 import (
-	"emreddit/api"
+	"emreddit/cmd"
 )
 
 func main() {
-	api.ListenPort()
+
+	cmd.Execute()
 }
