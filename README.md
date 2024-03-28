@@ -3,12 +3,15 @@ go-reddit-clone
     
 for running backend
 
- ``` go run main.go```
+ ``` go run emreddit create```
  
 
  
  for creating migration 
- ```go run create-migration.go -name {migrationName}```
+ ```go run emreddit create {migrationName}```
  
- for running migrations
- ```go run migration.go```
+ for running migrations up
+ ```go run emreddit up```
+ for running migrations down
+ ```go run emreddit down```
+ 
