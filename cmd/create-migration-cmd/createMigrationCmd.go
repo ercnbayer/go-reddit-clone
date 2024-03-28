@@ -12,6 +12,10 @@ var CreateMigration = &cobra.Command{
 	Short: "creates new migration file",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) < 1 {
+			println("filename needed")
+			return
+		}
 		migration_manager.Init(args[0])
 	},
 }
