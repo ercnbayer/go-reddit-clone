@@ -15,6 +15,7 @@ type UserUpdatePayload struct { //payload for updating user
 	Password string `validate:"omitempty,required"`
 	Email    string `validate:"omitempty,required,email"`
 }
+
 type UserProfile struct {
 	ID    string
 	Name  string

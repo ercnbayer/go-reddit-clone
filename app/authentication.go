@@ -5,10 +5,21 @@ import (
 	"emreddit/db"
 	"emreddit/logger"
 	"errors"
+	"math/rand"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
+
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+func RandStringBytesRmndr(n int) string {
+	b := make([]byte, n)
+	for i := range b {
+		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
+	}
+	return string(b)
+}
 
 func RegisterUser(user *db.UserEntity) error {
 
@@ -30,6 +41,10 @@ func UserLogin(user *db.UserEntity) error {
 	}
 
 	return nil
+}
+func CreateRefreshToken() string {
+	var keyLength = 20
+	return b64.URLEncoding.EncodeToString([]byte(RandStringBytesRmndr(keyLength)))
 }
 
 func CreateJWT(id string) (string, error) {

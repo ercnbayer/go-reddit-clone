@@ -127,14 +127,14 @@ func RunUpMigration(name string) error {
 
 func RunDown() error {
 
-	for _, migElement := range migration.Migrations_Arr {
+	for i := len(migration.Migrations_Arr) - 1; i >= 0; i-- {
+		migElement := migration.Migrations_Arr[i]
 
 		var err error = nil
+
 		if err = SearchMigration(migElement.Name); err != nil {
 			logger.Info("Migration has not found, Never Inserted before")
-
 			return err
-
 		}
 
 		if err := migElement.DownFn(); err != nil {

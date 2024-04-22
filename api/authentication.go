@@ -21,6 +21,11 @@ type UserLoginPayload struct { // payload for Login User
 	Password string `validate:"required"`
 }
 
+type SessionToken struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 func mapUserLoginPayloadToDbUser(user *UserLoginPayload, dbUser *db.UserEntity) {
 
 	dbUser.Email = user.Email
@@ -90,13 +95,29 @@ func userLogin(c *fiber.Ctx) error {
 		logger.Error("login err <?>", err)
 
 		return c.Status(404).JSON(err.Error())
+
+	}
+	refreshToken := app.CreateRefreshToken()
+
+	accessToken, err := app.CreateJWT(dbUser.ID)
+	if err != nil {
+		return c.Status(401).JSON(err.Error())
 	}
 
-	token, err := app.CreateJWT(dbUser.ID)
+	userTokens := SessionToken{accessToken, refreshToken}
+	return c.Status(200).JSON(userTokens)
+
+}
+
+func getAccessToken(c *fiber.Ctx) error {
+	var tokenString = c.Get("X-Auth-Token", "null")
+	accessToken, err := app.CreateJWT(tokenString)
+
 	if err != nil {
-		return c.Status(400).JSON(err.Error())
+		logger.Error("JWT Token Error:<?>", err)
+		return c.Status(401).JSON(err.Error())
 	}
-	return c.Status(200).JSON(token)
+	return c.Status(200).JSON(accessToken)
 
 }
 func me(c *fiber.Ctx) error {
@@ -106,7 +127,7 @@ func me(c *fiber.Ctx) error {
 
 	if err != nil {
 		logger.Error("JWT Token Error:<?>", err)
-		return c.Status(400).JSON(err.Error())
+		return c.Status(401).JSON(err.Error())
 	}
 
 	user, err := app.GetUser(id)
@@ -123,5 +144,6 @@ func init() {
 	UserApi.Post("/", registerUser)
 	AuthApi.Post("/login", userLogin)
 	AuthApi.Get("/me", me)
+	AuthApi.Get("/getAccessToken", getAccessToken)
 
 }
