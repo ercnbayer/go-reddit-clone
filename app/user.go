@@ -2,12 +2,14 @@ package app
 
 import (
 	"emreddit/db"
+	"emreddit/logger"
 )
 
 func GetUser(id string) (*db.UserEntity, error) {
 	var user *db.UserEntity = new(db.UserEntity)
 	err := db.ReadUser(id, user)
 	if err != nil {
+		logger.Info("Error Reading <?>", err)
 		return nil, err
 	}
 	return user, err

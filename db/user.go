@@ -3,17 +3,13 @@ package db
 import (
 	"emreddit/logger"
 	"errors"
-	"time"
 )
 
 type UserEntity struct {
-	ID           string    `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	Name         string    `gorm:"column:name;not null;"`
-	Password     string    `gorm:"column:password;not null;"`
-	Email        string    `gorm:"unique;not null;type:varchar(100);"`
-	RefreshToken string    `gorm:"column:Refresh_Token; type:varchar(20);"`
-	IsUsed       bool      `gorm:"column:Is_Used;"`
-	ExpireDate   time.Time `gorm:"column:Expire_Date"`
+	ID       string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Name     string `gorm:"column:name;not null;"`
+	Password string `gorm:"column:password;not null;"`
+	Email    string `gorm:"unique;not null;type:varchar(100);"`
 }
 
 // TableName overrides the table name used by User to `profiles`
@@ -43,7 +39,6 @@ func GetUserByEmailAndPassword(user *UserEntity) error { //checking login creds
 	return nil
 
 }
-
 func DeleteUser(id string) (string, error) { //delete User
 
 	var QueryResult = Db.Delete(&UserEntity{ID: id})

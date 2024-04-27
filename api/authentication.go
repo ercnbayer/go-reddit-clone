@@ -21,11 +21,6 @@ type UserLoginPayload struct { // payload for Login User
 	Password string `validate:"required"`
 }
 
-type SessionToken struct {
-	AccessToken  string `json:"access_token"`
-	RefreshToken string `json:"refresh_token"`
-}
-
 func mapUserLoginPayloadToDbUser(user *UserLoginPayload, dbUser *db.UserEntity) {
 
 	dbUser.Email = user.Email
@@ -97,32 +92,81 @@ func userLogin(c *fiber.Ctx) error {
 		return c.Status(404).JSON(err.Error())
 
 	}
-	refreshToken := app.CreateRefreshToken()
+	refreshToken, err := app.CreateRefreshToken(dbUser.ID)
+	if err != nil {
+		return c.Status(401).JSON(err.Error())
+	}
 
 	accessToken, err := app.CreateJWT(dbUser.ID)
 	if err != nil {
 		return c.Status(401).JSON(err.Error())
 	}
 
-	userTokens := SessionToken{accessToken, refreshToken}
-	return c.Status(200).JSON(userTokens)
+	userTokens := app.SessionToken{AccessToken: accessToken, RefreshToken: refreshToken}
+	bytes, err := app.JSONToBytes(&userTokens)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	encoded_token, err := app.EncryptToken(bytes)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON(encoded_token)
 
 }
 
 func getAccessToken(c *fiber.Ctx) error {
-	var tokenString = c.Get("X-Auth-Token", "null")
-	accessToken, err := app.CreateJWT(tokenString)
+
+	var tokenString = c.Get("X-Auth-Token", "")
+	SessionTokens, err := app.DecryptToken(tokenString)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	userID, err := app.CheckIfTokenValid(SessionTokens.RefreshToken)
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	refreshToken, err := app.CreateRefreshToken(userID)
+	if err != nil {
+		return c.Status(401).JSON(err.Error())
+	}
+	accessToken, err := app.CreateJWT(userID)
 
 	if err != nil {
 		logger.Error("JWT Token Error:<?>", err)
 		return c.Status(401).JSON(err.Error())
 	}
-	return c.Status(200).JSON(accessToken)
+
+	userTokens := app.SessionToken{AccessToken: accessToken, RefreshToken: refreshToken}
+	bytes, err := app.JSONToBytes(&userTokens)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+	encoded_token, err := app.EncryptToken(bytes)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	return c.Status(200).JSON(encoded_token)
 
 }
 func me(c *fiber.Ctx) error {
-
 	var tokenString = c.Get("X-Auth-Token", "null")
+
+	tokens, err := app.DecryptToken(tokenString)
+
+	if err != nil {
+		logger.Error("Decrypt Token Error:<?>", err)
+		return c.Status(401).JSON(err.Error())
+	}
+
+	tokenString = tokens.AccessToken
 	id, err := app.ParseJWT(tokenString)
 
 	if err != nil {

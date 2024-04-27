@@ -1,24 +1,24 @@
 package app
 
 import (
+	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"emreddit/config"
 	"emreddit/db"
 	"emreddit/logger"
+	"encoding/base64"
+	b64 "encoding/base64"
+	"encoding/json"
 	"errors"
-	"math/rand"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-func RandStringBytesRmndr(n int) string {
-	b := make([]byte, n)
-	for i := range b {
-		b[i] = letterBytes[rand.Int63()%int64(len(letterBytes))]
-	}
-	return string(b)
+type SessionToken struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 func RegisterUser(user *db.UserEntity) error {
@@ -42,9 +42,132 @@ func UserLogin(user *db.UserEntity) error {
 
 	return nil
 }
-func CreateRefreshToken() string {
-	var keyLength = 20
-	return b64.URLEncoding.EncodeToString([]byte(RandStringBytesRmndr(keyLength)))
+func tryCreate(userID string) (db.RefreshToken, error) {
+
+	token := db.RefreshToken{UserID: userID}
+	if err := db.CreateToken(&token); err != nil {
+		return db.RefreshToken{}, err
+	}
+	return token, nil
+}
+
+func CreateRefreshToken(userID string) (string, error) {
+
+	count := 10
+	var err error
+	for count > 1 {
+
+		token, err := tryCreate(userID)
+		if err == nil {
+			return token.ID, nil
+		}
+		count--
+	}
+	return "", err
+}
+
+func JSONToBytes(userTokens *SessionToken) ([]byte, error) {
+	return json.Marshal(userTokens)
+}
+
+func CheckIfTokenValid(refresh_token string) (string, error) {
+
+	token, err := db.ReadToken(refresh_token)
+
+	if err != nil {
+		return "", err
+	}
+
+	if token.ExpireDate.Compare(time.Now()) < 0 || !token.IsUsed {
+		return "", errors.New("invalid token")
+	}
+	token.IsUsed = true
+
+	return token.UserID, nil
+
+}
+
+func pkcs5UnPadding(src []byte) []byte {
+	length := len(src)
+	unpadding := int(src[length-1])
+
+	return src[:(length - unpadding)]
+}
+
+func EncryptToken(tokens []byte) (string, error) {
+
+	var plainTextBlock []byte
+	length := len(tokens)
+
+	if length%16 != 0 {
+		extendBlock := 16 - (length % 16)
+		plainTextBlock = make([]byte, length+extendBlock)
+		copy(plainTextBlock[length:], bytes.Repeat([]byte{uint8(extendBlock)}, extendBlock))
+	} else {
+		plainTextBlock = make([]byte, length)
+	}
+
+	copy(plainTextBlock, tokens)
+	block, err := aes.NewCipher(config.AES_KEY)
+
+	if err != nil {
+		return "", err
+	}
+
+	ciphertext := make([]byte, len(plainTextBlock))
+	mode := cipher.NewCBCEncrypter(block, config.IV)
+	mode.CryptBlocks(ciphertext, plainTextBlock)
+
+	str := base64.URLEncoding.EncodeToString(ciphertext)
+
+	return str, nil
+}
+
+func bytesToSessionToken(pb []byte) (*SessionToken, error) {
+
+	SessionTokens := new(SessionToken)
+	err := json.Unmarshal(pb, SessionTokens)
+	if err != nil {
+		logger.Info("JSON Unmarshal Error:<?>", err)
+		return nil, err
+	}
+	return SessionTokens, nil
+}
+
+func DecryptToken(encoded_token string) (*SessionToken, error) {
+
+	decoded_str, err := decodeFromb64(encoded_token)
+
+	if err != nil {
+		return nil, err
+	}
+
+	block, err := aes.NewCipher(config.AES_KEY)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(decoded_str)%aes.BlockSize != 0 {
+		return nil, errors.New("BLOCK SIZE CANNOT BE ZERO")
+	}
+
+	mode := cipher.NewCBCDecrypter(block, config.IV)
+	mode.CryptBlocks(decoded_str, decoded_str)
+	decoded_str = pkcs5UnPadding(decoded_str)
+
+	return bytesToSessionToken(decoded_str)
+}
+
+func decodeFromb64(str string) ([]byte, error) {
+
+	byte_arr, err := b64.URLEncoding.DecodeString(str)
+	if err != nil {
+		return nil, errors.New("INVALID TOKEN")
+
+	}
+
+	return byte_arr, nil
 }
 
 func CreateJWT(id string) (string, error) {

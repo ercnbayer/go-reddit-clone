@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"emreddit/config"
-	_ "emreddit/config"
 	"emreddit/logger"
 
 	"gorm.io/driver/postgres"
