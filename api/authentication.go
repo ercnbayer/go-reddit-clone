@@ -85,40 +85,21 @@ func userLogin(c *fiber.Ctx) error {
 
 	mapUserLoginPayloadToDbUser(&user, &dbUser) //maping user to db obj
 
-	if err := app.UserLogin(&dbUser); err != nil { // sending it to db
+	encoded_token, err := app.UserLogin(&dbUser)
+
+	if err != nil { // sending it to db
 
 		logger.Error("login err <?>", err)
 
 		return c.Status(404).JSON(err.Error())
 
 	}
-	refreshToken, err := app.CreateRefreshToken(dbUser.ID)
-	if err != nil {
-		return c.Status(401).JSON(err.Error())
-	}
-
-	accessToken, err := app.CreateJWT(dbUser.ID)
-	if err != nil {
-		return c.Status(401).JSON(err.Error())
-	}
-
-	userTokens := app.SessionToken{AccessToken: accessToken, RefreshToken: refreshToken}
-	bytes, err := app.JSONToBytes(&userTokens)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
-	}
-	encoded_token, err := app.EncryptToken(bytes)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
-	}
 
 	return c.Status(200).JSON(encoded_token)
 
 }
 
-func getAccessToken(c *fiber.Ctx) error {
+func refreshToken(c *fiber.Ctx) error {
 
 	var tokenString = c.Get("X-Auth-Token", "")
 	SessionTokens, err := app.DecryptToken(tokenString)
@@ -130,27 +111,9 @@ func getAccessToken(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
-	refreshToken, err := app.CreateRefreshToken(userID)
+	encoded_token, err := app.CreateEncryptedToken(userID)
 	if err != nil {
 		return c.Status(401).JSON(err.Error())
-	}
-	accessToken, err := app.CreateJWT(userID)
-
-	if err != nil {
-		logger.Error("JWT Token Error:<?>", err)
-		return c.Status(401).JSON(err.Error())
-	}
-
-	userTokens := app.SessionToken{AccessToken: accessToken, RefreshToken: refreshToken}
-	bytes, err := app.JSONToBytes(&userTokens)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
-	}
-	encoded_token, err := app.EncryptToken(bytes)
-
-	if err != nil {
-		return c.Status(400).JSON(err.Error())
 	}
 
 	return c.Status(200).JSON(encoded_token)
@@ -188,6 +151,6 @@ func init() {
 	UserApi.Post("/", registerUser)
 	AuthApi.Post("/login", userLogin)
 	AuthApi.Get("/me", me)
-	AuthApi.Get("/getAccessToken", getAccessToken)
+	AuthApi.Get("/refreshToken", refreshToken)
 
 }

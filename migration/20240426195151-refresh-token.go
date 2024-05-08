@@ -7,8 +7,8 @@ import (
 
 type RefreshToken20240426195151 struct {
 	ID         string    `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	IsUsed     bool      `gorm:"column:Is_Used;not null;default:false"`
-	ExpireDate time.Time `gorm:"column:Expire_Date;"`
+	IsUsed     bool      `gorm:"column:is_used;not null;default:false"`
+	ExpireDate time.Time `gorm:"column:expire_date;"`
 	UserID     string    `gorm:"type:uuid;not null;"`
 }
 

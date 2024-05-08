@@ -7,7 +7,7 @@ import (
 	"emreddit/config"
 	"emreddit/db"
 	"emreddit/logger"
-	"encoding/base64"
+
 	b64 "encoding/base64"
 	"encoding/json"
 	"errors"
@@ -32,15 +32,46 @@ func RegisterUser(user *db.UserEntity) error {
 	return nil
 }
 
-func UserLogin(user *db.UserEntity) error {
-
+func UserLogin(user *db.UserEntity) (string, error) {
 	if err := db.GetUserByEmailAndPassword(user); err != nil { // sending it to db
 
 		logger.Error("Login Error: <?>", err)
-		return err
+		return "", err
+	}
+	encryptToken, err := CreateEncryptedToken(user.ID)
+
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	return encryptToken, nil
+}
+
+func CreateEncryptedToken(id string) (string, error) {
+	refreshToken, err := createRefreshToken(id)
+
+	if err != nil {
+		return "", err
+	}
+
+	accessToken, err := createJWT(id)
+	if err != nil {
+		return "", err
+	}
+
+	userTokens := SessionToken{AccessToken: accessToken, RefreshToken: refreshToken}
+	bytes, err := jsonToBytes(&userTokens)
+
+	if err != nil {
+		return "", err
+	}
+	encoded_token, err := encryptToken(bytes)
+
+	if err != nil {
+		return "", err
+	}
+
+	return encoded_token, nil
 }
 func tryCreate(userID string) (db.RefreshToken, error) {
 
@@ -51,7 +82,7 @@ func tryCreate(userID string) (db.RefreshToken, error) {
 	return token, nil
 }
 
-func CreateRefreshToken(userID string) (string, error) {
+func createRefreshToken(userID string) (string, error) {
 
 	count := 10
 	var err error
@@ -66,7 +97,7 @@ func CreateRefreshToken(userID string) (string, error) {
 	return "", err
 }
 
-func JSONToBytes(userTokens *SessionToken) ([]byte, error) {
+func jsonToBytes(userTokens *SessionToken) ([]byte, error) {
 	return json.Marshal(userTokens)
 }
 
@@ -78,10 +109,18 @@ func CheckIfTokenValid(refresh_token string) (string, error) {
 		return "", err
 	}
 
-	if token.ExpireDate.Compare(time.Now()) < 0 || !token.IsUsed {
+	logger.Info(token.IsUsed)
+
+	if token.IsUsed {
 		return "", errors.New("invalid token")
 	}
 	token.IsUsed = true
+
+	err = db.UpdateToken(&token)
+
+	if err != nil {
+		return "", err
+	}
 
 	return token.UserID, nil
 
@@ -94,7 +133,7 @@ func pkcs5UnPadding(src []byte) []byte {
 	return src[:(length - unpadding)]
 }
 
-func EncryptToken(tokens []byte) (string, error) {
+func encryptToken(tokens []byte) (string, error) {
 
 	var plainTextBlock []byte
 	length := len(tokens)
@@ -118,7 +157,7 @@ func EncryptToken(tokens []byte) (string, error) {
 	mode := cipher.NewCBCEncrypter(block, config.IV)
 	mode.CryptBlocks(ciphertext, plainTextBlock)
 
-	str := base64.URLEncoding.EncodeToString(ciphertext)
+	str := b64.URLEncoding.EncodeToString(ciphertext)
 
 	return str, nil
 }
@@ -170,7 +209,7 @@ func decodeFromb64(str string) ([]byte, error) {
 	return byte_arr, nil
 }
 
-func CreateJWT(id string) (string, error) {
+func createJWT(id string) (string, error) {
 
 	var expire_date = time.Minute * 15
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

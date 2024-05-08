@@ -2,13 +2,14 @@ package db
 
 import (
 	"emreddit/logger"
+	"errors"
 	"time"
 )
 
 type RefreshToken struct {
 	ID         string    `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	IsUsed     bool      `gorm:"column:Is_Used;not null;default:false"`
-	ExpireDate time.Time `gorm:"column:Expire_Date;"`
+	IsUsed     bool      `gorm:"column:is_used;not null;default:false"`
+	ExpireDate time.Time `gorm:"column:expire_date;"`
 	UserID     string    `gorm:"type:uuid;not null;"`
 }
 
@@ -34,7 +35,7 @@ func ReadToken(id string) (RefreshToken, error) {
 
 	token := RefreshToken{}
 	token.ID = id
-	if err := Db.First(&token).Error; err != nil {
+	if err := Db.Where("Expire_Date > ?", time.Now()).Where(&RefreshToken{ID: id}).First(&token).Error; err != nil {
 
 		return RefreshToken{}, err
 
@@ -42,4 +43,21 @@ func ReadToken(id string) (RefreshToken, error) {
 
 	return token, nil
 
+}
+
+func UpdateToken(token *RefreshToken) error {
+	var result = Db.Updates(token)
+	if err := result.Error; err != nil { //checking for errors
+
+		logger.Error("err update", err)
+		return err
+
+	}
+
+	if result.RowsAffected == 0 { //check if any operation affects table
+		logger.Error("err user not found")
+
+		return errors.New("user NOT FOUND")
+	}
+	return nil
 }
