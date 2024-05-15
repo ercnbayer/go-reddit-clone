@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	createmigrationcmd "emreddit/cmd/create-migration-cmd"
@@ -32,9 +32,10 @@ func addSubCommands() {
 	rootCmd.AddCommand(migration_cmd.MigManagerDown)
 	rootCmd.AddCommand(createmigrationcmd.CreateMigration)
 }
-func init() {
+func main() {
 
 	addSubCommands()
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Execute()
 }

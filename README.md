@@ -8,10 +8,10 @@ for running backend
 
  
  for creating migration 
- ```go run emreddit_cmd.go create {migrationName}```
+ ``` cd  cmd && go run main.go create {migrationName}```
  
  for running migrations up
- ```go run emreddit_cmd.go up```
+ ```cd cmd && go run main.go up```
  for running migrations down
- ```go run emreddit_cmd.go down```
+ ``` cd cmd && go run main.go down```
  

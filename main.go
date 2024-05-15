@@ -6,6 +6,5 @@ import (
 
 func main() {
 
-	//cmd.Execute()
 	api.ListenPort()
 }
