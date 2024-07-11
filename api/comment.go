@@ -169,7 +169,7 @@ func init() {
 	CommentApi.Post("/", createComment)
 	CommentApi.Get(":id", readComment)
 	CommentApi.Delete(":id", deleteComment)
-	CommentApi.Update(":id", updateComment)
+	//CommentApi.Update(":id", updateComment)
 
 	logger.Info("SUCCESS")
 }
