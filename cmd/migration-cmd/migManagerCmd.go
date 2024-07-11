@@ -24,6 +24,15 @@ var MigManagerDown = &cobra.Command{
 	},
 }
 
+var RunSingleMig = &cobra.Command{
+	Use:   "single",
+	Short: "running migration up",
+	Long:  ``,
+	Run: func(cmd *cobra.Command, args []string) {
+		migration_manager.RunUpMigration(args[0])
+	},
+}
+
 func init() {
 
 }

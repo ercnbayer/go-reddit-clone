@@ -20,7 +20,7 @@ func Init(FileName string) {
 	templateFile := "migration_manager/migration.tmpl"
 	fileName := fmt.Sprintf("migration/%s-%s.go", timestamp, FileName)
 
-	migrationFile := []Migration{{Name: "User", Timestamp: timestamp, TableName: "users"}}
+	migrationFile := []Migration{{Name: FileName, Timestamp: timestamp, TableName: FileName + "s"}}
 
 	tmpl, err := template.ParseFiles(templateFile)
 	if err != nil {

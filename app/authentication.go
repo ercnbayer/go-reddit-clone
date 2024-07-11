@@ -129,7 +129,6 @@ func CheckIfTokenValid(refresh_token string) (string, error) {
 func pkcs5UnPadding(src []byte) []byte {
 	length := len(src)
 	unpadding := int(src[length-1])
-
 	return src[:(length - unpadding)]
 }
 
@@ -175,6 +174,10 @@ func bytesToSessionToken(pb []byte) (*SessionToken, error) {
 
 func DecryptToken(encoded_token string) (*SessionToken, error) {
 
+	if len(encoded_token) < 1 {
+
+		return nil, errors.New("not valid token")
+	}
 	decoded_str, err := decodeFromb64(encoded_token)
 
 	if err != nil {
@@ -211,7 +214,7 @@ func decodeFromb64(str string) ([]byte, error) {
 
 func createJWT(id string) (string, error) {
 
-	var expire_date = time.Minute * 15
+	var expire_date = time.Minute * 3600
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"exp":     time.Now().Add(expire_date).Unix(),
 		"iat":     time.Now().Unix(),
@@ -246,9 +249,9 @@ func ParseJWT(tokenString string) (string, error) {
 	}
 
 	var id string
-	if _, ok := token.Claims.(jwt.MapClaims); ok {
-		id, err = token.Claims.GetSubject()
-		if err != nil {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
+		id, ok = claims["subject"].(string)
+		if !ok {
 			logger.Error("Claim Error <?>", err)
 			return "", err
 		}
@@ -256,6 +259,6 @@ func ParseJWT(tokenString string) (string, error) {
 	} else {
 		logger.Error("Error <?>", err)
 	}
-
+	logger.Info("id:", id)
 	return id, nil
 }

@@ -78,7 +78,7 @@ func deleteUser(c *fiber.Ctx) error {
 
 	}
 
-	_, err = db.DeleteUser(id) // for delete api
+	_, err = app.DeleteUser(id) // for delete api
 
 	if err != nil {
 		logger.Error(err.Error())

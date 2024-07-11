@@ -101,17 +101,21 @@ func userLogin(c *fiber.Ctx) error {
 
 func refreshToken(c *fiber.Ctx) error {
 
-	var tokenString = c.Get("X-Auth-Token", "")
+	var tokenString = c.Get("X-Auth-Token")
+
 	SessionTokens, err := app.DecryptToken(tokenString)
+
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 
 	userID, err := app.CheckIfTokenValid(SessionTokens.RefreshToken)
+
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
 	}
 	encoded_token, err := app.CreateEncryptedToken(userID)
+
 	if err != nil {
 		return c.Status(401).JSON(err.Error())
 	}
@@ -120,7 +124,8 @@ func refreshToken(c *fiber.Ctx) error {
 
 }
 func me(c *fiber.Ctx) error {
-	var tokenString = c.Get("X-Auth-Token", "null")
+
+	var tokenString = c.Get("X-Auth-Token")
 
 	tokens, err := app.DecryptToken(tokenString)
 
@@ -131,6 +136,7 @@ func me(c *fiber.Ctx) error {
 
 	tokenString = tokens.AccessToken
 	id, err := app.ParseJWT(tokenString)
+	logger.Info("ID:", id)
 
 	if err != nil {
 		logger.Error("JWT Token Error:<?>", err)

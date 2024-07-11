@@ -7,6 +7,7 @@ import (
 
 func GetUser(id string) (*db.UserEntity, error) {
 	var user *db.UserEntity = new(db.UserEntity)
+	println("user", id)
 	err := db.ReadUser(id, user)
 	if err != nil {
 		logger.Info("Error Reading <?>", err)

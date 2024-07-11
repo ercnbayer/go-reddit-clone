@@ -30,6 +30,7 @@ func Execute() {
 func addSubCommands() {
 	rootCmd.AddCommand(migration_cmd.MigManagerUp)
 	rootCmd.AddCommand(migration_cmd.MigManagerDown)
+	rootCmd.AddCommand(migration_cmd.RunSingleMig)
 	rootCmd.AddCommand(createmigrationcmd.CreateMigration)
 }
 func main() {

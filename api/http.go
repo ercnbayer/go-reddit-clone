@@ -8,9 +8,11 @@ import (
 )
 
 var (
-	App     *fiber.App   = fiber.New()
-	UserApi fiber.Router = App.Group("/user")
-	AuthApi fiber.Router = App.Group("/auth")
+	App        *fiber.App   = fiber.New()
+	UserApi    fiber.Router = App.Group("/user")
+	AuthApi    fiber.Router = App.Group("/auth")
+	PostApi    fiber.Router = App.Group("/post")
+	CommentApi fiber.Router = App.Group("/comment")
 )
 
 func ListenPort() {
