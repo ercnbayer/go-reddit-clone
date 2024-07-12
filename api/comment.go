@@ -11,7 +11,6 @@ import (
 
 type CommentPayload struct {
 	Description string `validate:"required"`
-	PostID      string `validate:"required,uuid"`
 }
 
 func mapCommentPayloadToDbComment(Payload *CommentPayload, dbPost *db.Comment, id string) {
@@ -167,7 +166,7 @@ func updateComment(c *fiber.Ctx) error {
 
 	dbComment.ID = id
 
-	// maping user to dbUser
+	// maping user to dbComment
 
 	mapCommentPayloadToDbComment(&comment, &dbComment, id)
 
