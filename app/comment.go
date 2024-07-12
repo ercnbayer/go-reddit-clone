@@ -11,12 +11,16 @@ func CreateComment(comment *db.Comment) error {
 	return db.CreateComment(comment)
 }
 
-func DeleteComment(id string) (string, error) {
+func DeleteComment(id string, reqID string) (string, error) {
+
+	// TO DO ADD IF reqId permitted to do the operation
 
 	return db.DeleteComment(id)
 }
 
-func UpdateComment(comment *db.Comment) error {
+func UpdateComment(comment *db.Comment, id string) error {
+
+	// TO DO ADD IF id permitedd to do the operation
 
 	return db.UpdateComment(comment)
 }

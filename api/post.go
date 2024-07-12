@@ -10,12 +10,18 @@ import (
 )
 
 type PostPayload struct {
-	Description string
+	Description string `validate:"required"`
 }
 
 func mapPostPayloadToDbPost(Payload *PostPayload, dbPost *db.Post, id string) {
 	dbPost.Description = Payload.Description
 	dbPost.OwnerID = id
+}
+
+func patchUpdatePost(payload *PostPayload, dbPost *db.Post, id string) {
+
+	dbPost.Description = payload.Description
+	dbPost.ID = id
 }
 
 func readPost(c *fiber.Ctx) error {
@@ -99,10 +105,71 @@ func deletePost(c *fiber.Ctx) error {
 
 }
 
+func updatePost(c *fiber.Ctx) error {
+
+	id := c.Params("id") //getting id from params
+
+	err := validator.ValidateUUID(id)
+
+	if err != nil {
+
+		logger.Error("invalid req", err)
+		return c.Status(400).JSON(err.Error())
+
+	}
+
+	var tokenString = c.Get("X-Auth-Token")
+
+	SessionTokens, err := app.DecryptToken(tokenString)
+
+	if err != nil {
+
+		return c.Status(400).JSON(err.Error())
+	}
+
+	userID, err := app.ParseJWT(SessionTokens.AccessToken)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	var post PostPayload // creating instance
+
+	if err := c.BodyParser(&post); err != nil { // check if err from body
+
+		logger.Error(" Body Parse error = ", err, post)
+
+		return c.Status(404).JSON(err.Error())
+	}
+
+	if err := validator.Validate.Struct(&post); err != nil { //validating updated values
+
+		logger.Error("validator err= ", err)
+
+		return c.Status(404).JSON(err.Error())
+	}
+
+	var dbPost db.Post
+
+	// maping user to dbUser
+
+	patchUpdatePost(&post, &dbPost, id)
+
+	if err := app.UpdatePost(&dbPost, userID); err != nil {
+
+		logger.Error("Update ERR:", err)
+
+		return err
+	}
+
+	return c.Status(200).JSON(dbPost)
+}
+
 func init() {
 
 	PostApi.Post("/", createPost)
 	PostApi.Get(":id", readPost)
 	PostApi.Delete(":id", deletePost)
+	PostApi.Patch(":id", updatePost)
 	logger.Info("SUCCESS")
 }

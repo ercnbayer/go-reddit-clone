@@ -93,7 +93,22 @@ func deleteComment(c *fiber.Ctx) error {
 
 	}
 
-	_, err = app.DeleteComment(id) // for delete api
+	var tokenString = c.Get("X-Auth-Token")
+
+	SessionTokens, err := app.DecryptToken(tokenString)
+
+	if err != nil {
+
+		return c.Status(400).JSON(err.Error())
+	}
+
+	userID, err := app.ParseJWT(SessionTokens.AccessToken)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
+	_, err = app.DeleteComment(id, userID) // for delete api
 
 	if err != nil {
 		logger.Error(err.Error())
@@ -104,7 +119,7 @@ func deleteComment(c *fiber.Ctx) error {
 
 }
 
-/*func updateComment(c *fiber.Ctx) error {
+func updateComment(c *fiber.Ctx) error {
 
 	id := c.Params("id") //getting id from params
 
@@ -126,7 +141,7 @@ func deleteComment(c *fiber.Ctx) error {
 		return c.Status(400).JSON(err.Error())
 	}
 
-	//OwnerID, err := app.ParseJWT(SessionTokens.AccessToken)
+	userID, err := app.ParseJWT(SessionTokens.AccessToken)
 
 	if err != nil {
 		return c.Status(400).JSON(err.Error())
@@ -150,11 +165,13 @@ func deleteComment(c *fiber.Ctx) error {
 
 	var dbComment db.Comment
 
+	dbComment.ID = id
+
 	// maping user to dbUser
 
 	mapCommentPayloadToDbComment(&comment, &dbComment, id)
 
-	if err := app.UpdateComment(&dbComment); err != nil {
+	if err := app.UpdateComment(&dbComment, userID); err != nil {
 
 		logger.Error("Update ERR:", err)
 
@@ -162,14 +179,14 @@ func deleteComment(c *fiber.Ctx) error {
 	}
 
 	return c.Status(200).JSON(comment)
-}*/
+}
 
 func init() {
 
 	CommentApi.Post("/", createComment)
 	CommentApi.Get(":id", readComment)
 	CommentApi.Delete(":id", deleteComment)
-	//CommentApi.Update(":id", updateComment)
+	CommentApi.Patch(":id", updateComment)
 
 	logger.Info("SUCCESS")
 }
