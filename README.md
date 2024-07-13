@@ -8,10 +8,13 @@ for running backend
 
  
  for creating migration 
- ``` && go run cmd/main.go create {migrationName}```
+ ```  go run cmd/main.go create {migrationName}```
  
  for running migrations up
  ```cd cmd && go run ./cmd/main.go up```
  for running migrations down
  ``` cd cmd && go run ./cmd/main.go down```
+
+  for  running up a migration with the name
+ ``` cd cmd && go run ./cmd/main.go single {name}```
  
