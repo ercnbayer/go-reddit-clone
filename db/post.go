@@ -7,10 +7,11 @@ import (
 
 type Post struct {
 	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	OwnerID     string `gorm:"type:uuid;not null;"`
-	Upvote      int    `gorm:"type:int;not null"`
-	Downvote    int    `gorm:"type:int;not null"`
-	Description string `gorm:"type:varchar(100);"`
+	OwnerID     string
+	Owner       UserEntity `gorm:"foreignKey:OwnerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Upvote      int        `gorm:"type:int;not null"`
+	Downvote    int        `gorm:"type:int;not null"`
+	Description string     `gorm:"type:varchar(100);"`
 }
 
 func CreatePost(post *Post) error { //inserting comment

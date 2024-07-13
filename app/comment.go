@@ -8,6 +8,7 @@ func ReadComment(id string) (*db.Comment, error) {
 }
 
 func CreateComment(comment *db.Comment) error {
+
 	return db.CreateComment(comment)
 }
 

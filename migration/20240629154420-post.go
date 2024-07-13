@@ -4,10 +4,11 @@ import "emreddit/db"
 
 type Post20240629154420 struct {
 	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	OwnerID     string `gorm:"type:uuid;not null;"`
-	Upvote      int    `gorm:"type:int;not null"`
-	Downvote    int    `gorm:"type:int;not null"`
-	Description string `gorm:"type:varchar(100);"`
+	OwnerID     string
+	Owner       User20240409155548 `gorm:"foreignKey:OwnerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Upvote      int                `gorm:"type:int;not null"`
+	Downvote    int                `gorm:"type:int;not null"`
+	Description string             `gorm:"type:varchar(100);"`
 }
 
 func (table Post20240629154420) TableName() string {

@@ -58,8 +58,16 @@ func createPost(c *fiber.Ctx) error {
 	err = c.BodyParser(&PostPayload)
 
 	if err != nil {
+		logger.Info("ERR:", err)
 		return c.Status(400).JSON(err.Error())
 	}
+
+	err = validator.Validate.Struct(&PostPayload)
+
+	if err != nil {
+		return c.Status(400).JSON(err.Error())
+	}
+
 	logger.Info(SessionTokens.AccessToken)
 
 	userID, err := app.ParseJWT(SessionTokens.AccessToken)
@@ -70,7 +78,7 @@ func createPost(c *fiber.Ctx) error {
 
 	var dbPost db.Post
 	mapPostPayloadToDbPost(&PostPayload, &dbPost, userID)
-	dbPost.OwnerID = userID
+	//dbPost.OwnerID = "b7c9b56a-1b80-47d5-b471-bded8b6dc8a5"
 
 	err = app.CreatePost(&dbPost)
 

@@ -8,6 +8,7 @@ func ReadPost(id string) (*db.Post, error) {
 }
 
 func CreatePost(post *db.Post) error {
+	//
 	return db.CreatePost(post)
 }
 

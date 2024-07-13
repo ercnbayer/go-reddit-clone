@@ -4,9 +4,11 @@ import "emreddit/db"
 
 type Comment20240713172211 struct {
 	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	OwnerID     string `gorm:"type:uuid; not null;"`
-	PostID      string `gorm:"type:uuid;not null;"`
-	Description string `gorm:"type:varchar(100);"`
+	OwnerID     string
+	Owner       User20240409155548 `gorm:"foreignKey:OwnerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	PostID      string
+	Post        Post20240629154420 `gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	Description string             `gorm:"type:varchar(100);"`
 }
 
 func (table Comment20240713172211) TableName() string {

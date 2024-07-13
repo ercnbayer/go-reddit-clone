@@ -6,9 +6,11 @@ import (
 )
 
 type Comment struct {
-	ID          string `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
-	OwnerID     string `gorm:"type:uuid; not null;"`
-	PostID      string `gorm:"type:uuid;not null;"`
+	ID          string     `gorm:"type:uuid;default:gen_random_uuid();primaryKey"`
+	Owner       UserEntity `gorm:"foreignKey:OwnerID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	OwnerID     string
+	PostID      string
+	Post        Post   `gorm:"foreignKey:PostID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 	Description string `gorm:"type:varchar(100);"`
 }
 
