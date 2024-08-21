@@ -63,7 +63,7 @@ func ReadUser(id string, user *UserEntity) error {
 
 	user.ID = id //setting id
 
-	if err := Db.Find(user).Error; err != nil { //checking for errors.
+	if err := Db.First(user).Error; err != nil { //checking for errors.
 		return err
 	}
 	logger.Info("user", user)
